@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="GeneralPurposeRegisterSet.cpp" />
     <ClCompile Include="IOHelper.cpp" />
     <ClCompile Include="Memory.cpp" />

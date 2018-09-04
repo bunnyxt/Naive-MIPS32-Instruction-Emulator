@@ -74,6 +74,8 @@ class Alu {
 //Cpu class
 class Cpu {
 public:
+	Cpu();
+	GeneralPurposeRegisterSet& GetGeneralPurposeRegisterSet();
 
 private:
 	GeneralPurposeRegisterSet gprs;

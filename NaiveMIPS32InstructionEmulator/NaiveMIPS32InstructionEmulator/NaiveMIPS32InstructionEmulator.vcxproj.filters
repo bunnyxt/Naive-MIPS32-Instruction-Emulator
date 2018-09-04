@@ -30,6 +30,9 @@
     <ClCompile Include="GeneralPurposeRegisterSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NaiveMIPS32InstructionEmulator.h">

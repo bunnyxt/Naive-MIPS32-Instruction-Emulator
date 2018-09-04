@@ -26,6 +26,7 @@ int main() {
 		}
 	}
 	IOHelper::LoadCode(memory, codeFileIn);
+	cout << endl;
 
 	//load memory data
 	while (true)
@@ -44,6 +45,7 @@ int main() {
 		}
 	}
 	IOHelper::LoadMemoryData(memory, memoryDataFileIn);
+	cout << endl;
 
 	//load register data
 	while (true)
@@ -61,7 +63,8 @@ int main() {
 			break;
 		}
 	}
-	//IOHelper::LoadRegisterData(, registerDataFileIn);
+	IOHelper::LoadRegisterData(cpu.GetGeneralPurposeRegisterSet(), registerDataFileIn);
+	cout << endl;
 
 	return 0;
 }
