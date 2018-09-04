@@ -19,6 +19,8 @@ const int MEMSIZE = 4096;//4096 = 4KB
 class IOHelper;
 class Memory;
 class Register;
+class GeneralPurposeRegisterSet;
+class Cpu;
 
 //IOHelper class
 class IOHelper {
@@ -43,5 +45,31 @@ private:
 
 //Register class
 class Register {
+public:
+	Register();
+	word Get();
+	void Set(word w);
 
+private:
+	word data;
+};
+
+//GeneralPurposeRegisterSet class
+class GeneralPurposeRegisterSet {
+public:
+	GeneralPurposeRegisterSet();
+	word Get(int index);
+	void Set(int index, word w);
+
+private:
+	Register gpr[32];
+};
+
+//Cpu class
+class Cpu {
+public:
+
+private:
+	GeneralPurposeRegisterSet gprs;
+	Register pc;
 };

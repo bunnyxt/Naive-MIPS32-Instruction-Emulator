@@ -2,6 +2,7 @@
 
 int main() {
 	//initialize components
+	Cpu cpu;
 	Memory memory;
 
 	//load code & data
