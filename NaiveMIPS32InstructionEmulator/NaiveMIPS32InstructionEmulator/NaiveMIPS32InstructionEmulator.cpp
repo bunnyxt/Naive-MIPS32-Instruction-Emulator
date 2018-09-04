@@ -66,5 +66,7 @@ int main() {
 	IOHelper::LoadRegisterData(cpu.GetGeneralPurposeRegisterSet(), registerDataFileIn);
 	cout << endl;
 
+	cout << "By.bunnyxt 2018-9-4" << endl;
+
 	return 0;
 }

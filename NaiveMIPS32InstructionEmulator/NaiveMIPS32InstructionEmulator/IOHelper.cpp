@@ -37,11 +37,12 @@ void IOHelper::LoadCode(Memory &m, ifstream &in)
 		if (count == 32)
 		{
 			m.WriteWord(add, i);
+			cout << "Instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << " loaded in address " << add << "!" << endl;
 			add += 4;
 		}
 		else
 		{
-			//
+			cout << "Cannot load invalid instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "!" << endl;
 		}
 	}
 
@@ -90,14 +91,15 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 			}
 		}
 
-		if (count == 32)
-		{
-			m.WriteWord(add, w);
-		}
-		else
-		{
-			//
-		}
+		//if (count == 32)
+		//{
+		m.WriteWord(add, w);
+		cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in address " << add << "!" << endl;
+		//}
+		//else
+		//{
+		//	cout << "Cannot load invalid data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in address " << add << "!" << endl;
+		//}
 	}
 
 	cout << "Memory data loaded successfully!" << endl;
@@ -145,14 +147,26 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 			}
 		}
 
-		if (count == 32)
+		//if (count == 32)
+		//{
+		if (index >=0 && index <= 31)
 		{
 			gprs.Set(index, w);
+			if (index != 0)
+			{
+				cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in register " << index << "!" << endl;
+			}
 		}
 		else
 		{
-			//
+			cout << "Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in invalid register " << index << "!" << endl;
 		}
+
+		//}
+		//else
+		//{
+		//	cout << "Cannot load invalid data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in register " << index << "!" << endl;
+		//}
 	}
 
 	cout << "Register data loaded successfully!" << endl;
