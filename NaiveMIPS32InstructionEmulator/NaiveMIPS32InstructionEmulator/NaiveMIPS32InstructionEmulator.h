@@ -20,14 +20,15 @@ class IOHelper;
 class Memory;
 class Register;
 class GeneralPurposeRegisterSet;
+class Alu;
 class Cpu;
 
 //IOHelper class
 class IOHelper {
 public:
-	static bool LoadCode(Memory &m, ifstream &in);
-	static bool LoadMemoryData(Memory &m, ifstream &in);
-	static bool LoadRegisterData(Memory &m, ifstream &in);
+	static void LoadCode(Memory &m, ifstream &in);
+	static void LoadMemoryData(Memory &m, ifstream &in);
+	static void LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in);
 };
 
 //Memory class
@@ -63,6 +64,11 @@ public:
 
 private:
 	Register gpr[32];
+};
+
+//Alu class
+class Alu {
+
 };
 
 //Cpu class

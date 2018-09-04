@@ -61,7 +61,7 @@ int main() {
 			break;
 		}
 	}
-	IOHelper::LoadRegisterData(memory, registerDataFileIn);
+	//IOHelper::LoadRegisterData(, registerDataFileIn);
 
 	return 0;
 }
