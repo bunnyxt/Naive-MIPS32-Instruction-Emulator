@@ -149,7 +149,7 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 
 		//if (count == 32)
 		//{
-		if (index >=0 && index <= 31)
+		if (index >= 0 && index <= 31)
 		{
 			gprs.Set(index, w);
 			if (index != 0)
@@ -161,7 +161,6 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 		{
 			cout << "Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in invalid register " << index << "!" << endl;
 		}
-
 		//}
 		//else
 		//{
@@ -170,4 +169,16 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 	}
 
 	cout << "Register data loaded successfully!" << endl;
+}
+
+void IOHelper::OpenLogFileStream()
+{
+	string fileName = "log_";
+	time_t t = time(NULL);
+	tm* local = localtime(&t);
+	char buf[128] = { 0 };
+	strftime(buf, 64, "%Y-%m-%d_%H:%M:%S", local);
+	fileName += buf;
+	fileName += ".txt";
+	log.open(fileName);
 }

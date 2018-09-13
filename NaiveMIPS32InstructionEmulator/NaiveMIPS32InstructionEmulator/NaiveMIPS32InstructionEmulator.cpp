@@ -1,6 +1,12 @@
 #include "NaiveMIPS32InstructionEmulator.h"
 
+//initialize log filestream
+ofstream IOHelper::log = ofstream();
+
 int main() {
+	//open log
+	IOHelper::OpenLogFileStream();
+
 	//initialize components
 	Cpu cpu;
 	Memory memory;

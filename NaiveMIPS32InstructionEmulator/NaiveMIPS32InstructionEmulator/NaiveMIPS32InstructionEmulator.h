@@ -1,8 +1,11 @@
 #pragma once
+#pragma warning (disable : 4996)
 
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <time.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -30,6 +33,10 @@ public:
 	static void LoadCode(Memory &m, ifstream &in);
 	static void LoadMemoryData(Memory &m, ifstream &in);
 	static void LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in);
+	static void OpenLogFileStream();
+
+private:
+	static ofstream log;
 };
 
 

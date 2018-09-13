@@ -7,7 +7,15 @@ GeneralPurposeRegisterSet::GeneralPurposeRegisterSet()
 
 word GeneralPurposeRegisterSet::Get(int index)
 {
-	return gpr[index].Get();
+	if (index >= 32 || index < 0)
+	{
+		return gpr[index].Get();
+	}
+	else
+	{
+		cout << "Warning! Cannot find register r" << index << "! Now return 0." << endl;
+		return 0;
+	}
 }
 
 void GeneralPurposeRegisterSet::Set(int index, word w)
