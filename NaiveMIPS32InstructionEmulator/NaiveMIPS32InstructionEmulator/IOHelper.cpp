@@ -37,12 +37,14 @@ void IOHelper::LoadCode(Memory &m, ifstream &in)
 		if (count == 32)
 		{
 			m.WriteWord(add, i);
-			cout << "Instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << " loaded in address " << add << "!" << endl;
+			cout << "Instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << " loaded in address " << add << "." << endl;
+			WriteLog("Instruction " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + " loaded in address " + to_string(add) + ".");
 			add += 4;
 		}
 		else
 		{
-			cout << "Cannot load invalid instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "!" << endl;
+			cout << "Warning! Cannot load invalid instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "." << endl;
+			WriteLog("Warning! Cannot load invalid instruction " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + ".");
 		}
 	}
 
@@ -94,7 +96,8 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 		//if (count == 32)
 		//{
 		m.WriteWord(add, w);
-		cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in address " << add << "!" << endl;
+		cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in address " << add << "." << endl;
+		WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + " loaded in address " + to_string(add) + ".");
 		//}
 		//else
 		//{
@@ -154,12 +157,14 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 			gprs.Set(index, w);
 			if (index != 0)
 			{
-				cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in register " << index << "!" << endl;
+				cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in register " << index << "." << endl;
+				WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + " loaded in register " + to_string(index) + ".");
 			}
 		}
 		else
 		{
-			cout << "Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in invalid register " << index << "!" << endl;
+			cout << "Warning! Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in invalid register " << index << "." << endl;
+			WriteLog("Warning! Cannot load data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + " in invalid register " + to_string(index) + ".");
 		}
 		//}
 		//else
