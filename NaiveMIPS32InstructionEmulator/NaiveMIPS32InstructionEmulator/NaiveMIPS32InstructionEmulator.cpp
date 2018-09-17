@@ -4,8 +4,21 @@
 ofstream IOHelper::log = ofstream();
 
 int main() {
-	//open log
-	IOHelper::OpenLogFileStream();
+	cout << "Naive MIPS32 Instruction Emulator" << endl;
+	cout << endl;
+
+	//open log filestream
+	if (IOHelper::OpenLogFileStream())
+	{
+		cout << "Log file created successfully!" << endl;
+		IOHelper::WriteLog("Naive MIPS32 Instruction Emulator\n");
+		IOHelper::WriteLog("Log file created successfully!");
+	}
+	else
+	{
+		cout << "Error! Fail to create log file. Now exit..." << endl;
+		exit(0);
+	}
 
 	//initialize components
 	Cpu cpu;

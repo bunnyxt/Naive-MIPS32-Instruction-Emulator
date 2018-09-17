@@ -171,14 +171,52 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 	cout << "Register data loaded successfully!" << endl;
 }
 
-void IOHelper::OpenLogFileStream()
+bool IOHelper::OpenLogFileStream()
 {
 	string fileName = "log_";
 	time_t t = time(NULL);
 	tm* local = localtime(&t);
 	char buf[128] = { 0 };
-	strftime(buf, 64, "%Y-%m-%d_%H:%M:%S", local);
+	strftime(buf, 64, "%Y-%m-%d_%H-%M-%S", local);
 	fileName += buf;
 	fileName += ".txt";
 	log.open(fileName);
+	if (!log.is_open())
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool IOHelper::WriteLog(string s)
+{
+	if (log.is_open())
+	{
+		time_t t = time(NULL);
+		tm* local = localtime(&t);
+		char buf[128] = { 0 };
+		strftime(buf, 64, "%Y-%m-%d_%H:%M:%S", local);
+		log << buf << " " << s << endl;;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool IOHelper::CloseLogFileStream()
+{
+	if (log.is_open())
+	{
+		log.close();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

@@ -33,7 +33,9 @@ public:
 	static void LoadCode(Memory &m, ifstream &in);
 	static void LoadMemoryData(Memory &m, ifstream &in);
 	static void LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in);
-	static void OpenLogFileStream();
+	static bool OpenLogFileStream();
+	static bool WriteLog(string s);
+	static bool CloseLogFileStream();
 
 private:
 	static ofstream log;
