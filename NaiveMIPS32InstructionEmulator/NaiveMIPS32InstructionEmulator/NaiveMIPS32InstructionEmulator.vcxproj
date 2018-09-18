@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="ConvertHelper.cpp" />
     <ClCompile Include="Cpu.cpp" />
+    <ClCompile Include="Decoder.cpp" />
     <ClCompile Include="GeneralPurposeRegisterSet.cpp" />
     <ClCompile Include="IOHelper.cpp" />
     <ClCompile Include="Memory.cpp" />

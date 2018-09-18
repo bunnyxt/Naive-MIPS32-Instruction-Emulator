@@ -25,6 +25,7 @@ class Memory;
 class Register;
 class GeneralPurposeRegisterSet;
 class Alu;
+class Decoder;
 class Cpu;
 
 //IOHelper class
@@ -94,13 +95,135 @@ class Alu {
 
 };
 
+//Decoder class
+class Decoder {
+public:
+	word GetOp(instruction i);
+	word GetRs(instruction i);
+	word GetRt(instruction i);
+	word GetRd(instruction i);
+	word GetShamt(instruction i);
+	word GetFunc(instruction i);
+	word GetImmediate(instruction i);
+	address GetAddress(instruction i);
+
+private:
+	unsigned int getSubNumInUnsignedInt(unsigned int ui, int start, int length);
+};
+
 //Cpu class
 class Cpu {
 public:
 	Cpu();
+
+	bool IsReady(int index);
+	void MoveOnReady();
+	void DropReady(int index);
+
 	GeneralPurposeRegisterSet& GetGeneralPurposeRegisterSet();
+	void SetPc(address add);
+	address GetPc();
+	void SetIr(instruction i);
+	instruction GetIr();
+
+	Decoder GetDecoder();
+
+	void SetIdExTypeR(word w);
+	word GetIdExTypeR();
+	void SetIdExTypeI(word w);
+	word GetIdExTypeI();
+	void SetIdExTypeJ(word w);
+	word GetIdExTypeJ();
+	void SetIdExOp(word w);
+	word GetIdExOp();
+	void SetIdExRs(word w);
+	word GetIdExRs();
+	void SetIdExRt(word w);
+	word GetIdExRt();
+	void SetIdExRd(word w);
+	word GetIdExRd();
+	void SetIdExShamt(word w);
+	word GetIdExShamt();
+	void SetIdExFunc(word w);
+	word GetIdExFunc();
+	void SetIdExImmediate(word w);
+	word GetIdExImmediate();
+	void SetIdExAddress(address add);
+	address GetIdExAddress();
+	void SetIdExNeedLoad(word w);
+	word GetIdExNeedLoad();
+	void SetIdExNeedStore(word w);
+	word GetIdExNeedStore();
+	void SetIdExAddress(address add);
+	address GetIdExAddress();
+	void SetIdExReg(word w);
+	word GetIdExReg();
+	void SetIdExNeedWriteBack(word w);
+	word GetIdExNeedWriteBack();
+	void SetIdExIndex(word w);
+	word GetIdExIndex();
+	void SetIdExWord(word w);
+	word GetIdExWord();
+
+	void SetExMemNeedLoad(word w);
+	word GetExMemNeedLoad();
+	void SetExMemNeedStore(word w);
+	word GetExMemNeedStore();
+	void SetExMemAddress(address add);
+	address GetExMemAddress();
+	void SetExMemReg(word w);
+	word GetExMemReg();
+	void SetExMemNeedWriteBack(word w);
+	word GetExMemNeedWriteBack();
+	void SetExMemIndex(word w);
+	word GetExMemIndex();
+	void SetExMemWord(word w);
+	word GetExMemWord();
+
+	void SetMemWbNeedWriteBack(word w);
+	word GetMemWbNeedWriteBack();
+	void SetMemWbIndex(word w);
+	word GetMemWbIndex();
+	void SetMemWbWord(word w);
+	word GetMemWbWord();
 
 private:
+	bool isReady[5];
+
+	Decoder decoder;
+
 	GeneralPurposeRegisterSet gprs;
 	Register pc;
+	Register ir;
+
+	Register id_ex_type_R;//type R instruction
+	Register id_ex_type_I;//type I instruction
+	Register id_ex_type_J;//type J instruction
+	Register id_ex_op;//op part
+	Register id_ex_rs;//rs part
+	Register id_ex_rt;//rt part
+	Register id_ex_rd;//rd part
+	Register id_ex_shamt;//shamt part
+	Register id_ex_func;//func part
+	Register id_ex_immediate;//func part
+	Register id_ex_address;//func part
+	Register id_ex_need_load;//meed load
+	Register id_ex_need_store;//need store
+	Register id_ex_address;//l/s memory address
+	Register id_ex_reg;//store to memory word reg
+	Register id_ex_need_write_back;//need write bacl
+	Register id_ex_index;//write back reg index
+	Register id_ex_word;//write back word
+
+	Register ex_mem_need_load;//need load
+	Register ex_mem_need_store;//nees store
+	Register ex_mem_address;//l/s memory address
+	Register ex_mem_reg;//store to memory word reg
+	Register ex_mem_need_write_back;//need write back
+	Register ex_mem_index;//write back index
+	Register ex_mem_word;//write back word
+
+	Register mem_wb_need_write_back;//need write back
+	Register mem_wb_index;//write back reg index
+	Register mem_wb_word;//write back word
 };

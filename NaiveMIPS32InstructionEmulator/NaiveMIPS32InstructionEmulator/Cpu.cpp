@@ -1,11 +1,346 @@
 #include "NaiveMIPS32InstructionEmulator.h"
 
-Cpu::Cpu() 
+Cpu::Cpu()
 {
-
+	isReady[0] = true;
+	for (int i = 1; i < 5; i++)
+	{
+		isReady[i] = false;
+	}
 }
 
 GeneralPurposeRegisterSet & Cpu::GetGeneralPurposeRegisterSet()
 {
 	return this->gprs;
+}
+
+void Cpu::SetPc(address add)
+{
+	pc.Set(add);
+}
+
+address Cpu::GetPc()
+{
+	return pc.Get();
+}
+
+void Cpu::SetIr(instruction i)
+{
+	ir.Set(i);
+}
+
+instruction Cpu::GetIr()
+{
+	return ir.Get();
+}
+
+Decoder Cpu::GetDecoder()
+{
+	return decoder;
+}
+
+void Cpu::SetIdExTypeR(word w)
+{
+	id_ex_type_R.Set(w);
+}
+
+word Cpu::GetIdExTypeR()
+{
+	return id_ex_type_R.Get();
+}
+
+void Cpu::SetIdExTypeI(word w)
+{
+	id_ex_type_I.Set(w);
+}
+
+word Cpu::GetIdExTypeI()
+{
+	return id_ex_type_I.Get();
+}
+
+void Cpu::SetIdExTypeJ(word w)
+{
+	id_ex_type_J.Set(w);
+}
+
+word Cpu::GetIdExTypeJ()
+{
+	return id_ex_type_J.Get();
+}
+
+void Cpu::SetIdExOp(word w)
+{
+	id_ex_op.Set(w);
+}
+
+word Cpu::GetIdExOp()
+{
+	return id_ex_op.Get();
+}
+
+void Cpu::SetIdExRs(word w)
+{
+	id_ex_rs.Set(w);
+}
+
+word Cpu::GetIdExRs()
+{
+	return id_ex_rs.Get();
+}
+
+void Cpu::SetIdExRt(word w)
+{
+	id_ex_rt.Set(w);
+}
+
+word Cpu::GetIdExRt()
+{
+	return id_ex_rt.Get();
+}
+
+void Cpu::SetIdExRd(word w)
+{
+	id_ex_rd.Set(w);
+}
+
+word Cpu::GetIdExRd()
+{
+	return id_ex_rd.Get();
+}
+
+void Cpu::SetIdExShamt(word w)
+{
+	id_ex_shamt.Set(w);
+}
+
+word Cpu::GetIdExShamt()
+{
+	return id_ex_shamt.Get();
+}
+
+void Cpu::SetIdExFunc(word w)
+{
+	id_ex_func.Set(w);
+}
+
+word Cpu::GetIdExFunc()
+{
+	return id_ex_func.Get();
+}
+
+void Cpu::SetIdExImmediate(word w)
+{
+	id_ex_immediate.Set(w);
+}
+
+word Cpu::GetIdExImmediate()
+{
+	return id_ex_immediate.Get();
+}
+
+bool Cpu::IsReady(int index)
+{
+	if (index >= 0 && index < 5)
+	{
+		return isReady[index];
+	}
+	else
+	{
+		return true;
+	}
+}
+
+void Cpu::MoveOnReady()
+{
+	for (int i = 4; i > 0; i--)
+	{
+		isReady[i] = isReady[i - 1];
+	}
+}
+
+void Cpu::DropReady(int index)
+{
+	if (index >= 0 && index < 5)
+	{
+		for (int i = index; i > 0; i--)
+		{
+			isReady[i] = false;
+		}
+		isReady[0] = true;
+		for (int i = 4; i > index; i--)
+		{
+			isReady[i] = isReady[i - 1];
+		}
+	}
+}
+
+void Cpu::SetIdExNeedLoad(word w)
+{
+	id_ex_need_load.Set(w);
+}
+
+word Cpu::GetIdExNeedLoad()
+{
+	return id_ex_need_load.Get();
+}
+
+void Cpu::SetIdExNeedStore(word w)
+{
+	id_ex_need_store.Set(w);
+}
+
+word Cpu::GetIdExNeedStore()
+{
+	return id_ex_need_store.Get();
+}
+
+void Cpu::SetIdExAddress(address add)
+{
+	id_ex_address.Set(add);
+}
+
+address Cpu::GetIdExAddress()
+{
+	return id_ex_address.Get();
+}
+
+void Cpu::SetIdExReg(word w)
+{
+	id_ex_reg.Set(w);
+}
+
+word Cpu::GetIdExReg()
+{
+	return id_ex_reg.Get();
+}
+
+void Cpu::SetIdExNeedWriteBack(word w)
+{
+	id_ex_need_write_back.Set(w);
+}
+
+word Cpu::GetIdExNeedWriteBack()
+{
+	return id_ex_need_write_back.Get();
+}
+
+void Cpu::SetIdExIndex(word w)
+{
+	id_ex_index.Set(w);
+}
+
+word Cpu::GetIdExIndex()
+{
+	return id_ex_index.Get();
+}
+
+void Cpu::SetIdExWord(word w)
+{
+	id_ex_word.Set(w);
+}
+
+word Cpu::GetIdExWord()
+{
+	return id_ex_word.Get();
+}
+
+void Cpu::SetExMemNeedLoad(word w)
+{
+	ex_mem_need_load.Set(w);
+}
+
+word Cpu::GetExMemNeedLoad()
+{
+	return ex_mem_need_load.Get();
+}
+
+void Cpu::SetExMemNeedStore(word w)
+{
+	ex_mem_need_store.Set(w);
+}
+
+word Cpu::GetExMemNeedStore()
+{
+	return ex_mem_need_store.Get();
+}
+
+void Cpu::SetExMemAddress(address add)
+{
+	ex_mem_address.Set(add);
+}
+
+address Cpu::GetExMemAddress()
+{
+	return ex_mem_address.Get();
+}
+
+void Cpu::SetExMemReg(word w)
+{
+	ex_mem_reg.Set(w);
+}
+
+word Cpu::GetExMemReg()
+{
+	return ex_mem_reg.Get();
+}
+
+void Cpu::SetExMemNeedWriteBack(word w)
+{
+	ex_mem_need_write_back.Set(w);
+}
+
+word Cpu::GetExMemNeedWriteBack()
+{
+	return ex_mem_need_write_back.Get();
+}
+
+void Cpu::SetExMemIndex(word w)
+{
+	ex_mem_index.Set(w);
+}
+
+word Cpu::GetExMemIndex()
+{
+	return ex_mem_index.Get();
+}
+
+void Cpu::SetExMemWord(word w)
+{
+	ex_mem_word.Set(w);
+}
+
+word Cpu::GetExMemWord()
+{
+	return ex_mem_word.Get();
+}
+
+void Cpu::SetMemWbNeedWriteBack(word w)
+{
+	mem_wb_need_write_back.Set(w);
+}
+
+word Cpu::GetMemWbNeedWriteBack()
+{
+	return mem_wb_need_write_back.Get();
+}
+
+void Cpu::SetMemWbIndex(word w)
+{
+	mem_wb_index.Set(w);
+}
+
+word Cpu::GetMemWbIndex()
+{
+	return mem_wb_index.Get();
+}
+
+void Cpu::SetMemWbWord(word w)
+{
+	mem_wb_word.Set(w);
+}
+
+word Cpu::GetMemWbWord()
+{
+	return mem_wb_word.Get();
 }
