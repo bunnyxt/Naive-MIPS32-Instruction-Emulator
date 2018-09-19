@@ -158,6 +158,20 @@ int main() {
 
 				//unlock reg
 				cpu.UnlockReg(cpu.GetMemWbIndex());
+
+				//free fw
+				if (cpu.GetFw0Index() == cpu.GetMemWbIndex())
+				{
+					cpu.SetFw0Index(999);
+				}
+				else if(cpu.GetFw1Index() == cpu.GetMemWbIndex())
+				{
+					cpu.SetFw1Index(999);
+				}
+				else
+				{
+					//no index from found, error occurred
+				}
 			}
 		}
 
@@ -177,7 +191,7 @@ int main() {
 				cpu.SetMemWbWord(memory.ReadWord(cpu.GetExMemAddress()));
 
 				//not allow IF
-				cpu.SetMemIfAllow(0);
+				cpu.SetMemIfAllow(1);
 			}
 			else if (cpu.GetExMemNeedStore() != 0)
 			{
@@ -185,12 +199,12 @@ int main() {
 				memory.WriteWord(cpu.GetExMemAddress(), cpu.GetExMemRegValue());
 
 				//not allow IF
-				cpu.SetMemIfAllow(0);
+				cpu.SetMemIfAllow(1);
 			}
 			else
 			{
 				//allow IF
-				cpu.SetMemIfAllow(1);
+				cpu.SetMemIfAllow(0);
 			}
 
 			//TODO log
@@ -214,6 +228,22 @@ int main() {
 			{
 				//set word
 				cpu.SetExMemWord(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
+
+				//set FW
+				if (cpu.GetFw0Index() == 999)
+				{
+					cpu.SetFw0Index(cpu.GetIdExIndex());
+					cpu.SetFw0Value(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
+				}
+				else if(cpu.GetFw1Index() == 999)
+				{
+					cpu.SetFw1Index(cpu.GetIdExIndex());
+					cpu.SetFw1Value(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
+				}
+				else
+				{
+					//no free fw now, fail to unlock before
+				}
 			}
 			else if (cpu.GetIdExTypeI() == 1)
 			{
@@ -606,7 +636,7 @@ int main() {
 		}
 		else
 		{
-			if (cpu.GetMemIfAllow() == 0)
+			if (cpu.GetMemIfAllow() == 1)
 			{
 				//delay
 			}
@@ -650,6 +680,8 @@ int main() {
 			case 2:
 				break;
 			case 3:
+				break;
+			case 0:
 				break;
 			default:
 				cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;

@@ -7,7 +7,7 @@ GeneralPurposeRegisterSet::GeneralPurposeRegisterSet()
 
 word GeneralPurposeRegisterSet::Get(int index)
 {
-	if (index >= 32 || index < 0)
+	if (index >= 0 && index < 32)
 	{
 		return gpr[index].Get();
 	}
