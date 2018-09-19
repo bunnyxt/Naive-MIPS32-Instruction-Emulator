@@ -291,15 +291,15 @@ word Cpu::GetIdExNeedStore()
 	return id_ex_need_store.Get();
 }
 
-void Cpu::SetIdExAddress(address add)
-{
-	id_ex_address.Set(add);
-}
-
-address Cpu::GetIdExAddress()
-{
-	return id_ex_address.Get();
-}
+//void Cpu::SetIdExAddress(address add)
+//{
+//	id_ex_address.Set(add);
+//}
+//
+//address Cpu::GetIdExAddress()
+//{
+//	return id_ex_address.Get();
+//}
 
 void Cpu::SetIdExRegValue(word w)
 {
@@ -331,15 +331,15 @@ word Cpu::GetIdExIndex()
 	return id_ex_index.Get();
 }
 
-void Cpu::SetIdExWord(word w)
-{
-	id_ex_word.Set(w);
-}
-
-word Cpu::GetIdExWord()
-{
-	return id_ex_word.Get();
-}
+//void Cpu::SetIdExWord(word w)
+//{
+//	id_ex_word.Set(w);
+//}
+//
+//word Cpu::GetIdExWord()
+//{
+//	return id_ex_word.Get();
+//}
 
 void Cpu::SetExMemNeedLoad(word w)
 {
@@ -409,6 +409,16 @@ void Cpu::SetExMemWord(word w)
 word Cpu::GetExMemWord()
 {
 	return ex_mem_word.Get();
+}
+
+void Cpu::SetMemIfAllow(word w)
+{
+	mem_if_allow.Set(w);
+}
+
+word Cpu::GetMemIfAllow()
+{
+	return mem_if_allow.Get();
 }
 
 void Cpu::SetMemWbNeedWriteBack(word w)

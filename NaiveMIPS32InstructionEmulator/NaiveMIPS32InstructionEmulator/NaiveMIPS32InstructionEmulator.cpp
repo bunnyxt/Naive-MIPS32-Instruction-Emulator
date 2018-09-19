@@ -175,12 +175,22 @@ int main() {
 			{
 				//TODO log
 				cpu.SetMemWbWord(memory.ReadWord(cpu.GetExMemAddress()));
-			}
 
-			if (cpu.GetExMemNeedStore() != 0)
+				//not allow IF
+				cpu.SetMemIfAllow(0);
+			}
+			else if (cpu.GetExMemNeedStore() != 0)
 			{
 				//TODO log
 				memory.WriteWord(cpu.GetExMemAddress(), cpu.GetExMemRegValue());
+
+				//not allow IF
+				cpu.SetMemIfAllow(0);
+			}
+			else
+			{
+				//allow IF
+				cpu.SetMemIfAllow(1);
 			}
 
 			//TODO log
@@ -200,12 +210,33 @@ int main() {
 		else
 		{
 			//get instruction type
+			if (cpu.GetIdExTypeR() == 1)
+			{
+
+			}
+			else if (cpu.GetIdExTypeI() == 1)
+			{
+
+			}
+			else if (cpu.GetIdExTypeJ() == 1)
+			{
+
+			}
+			else
+			{
+
+			}
 
 			//get ex type
 
 			//get numbers and send them to alu or others
 
 			//trans regs
+			cpu.SetExMemNeedLoad(cpu.GetIdExNeedLoad());
+			cpu.SetExMemNeedStore(cpu.GetIdExNeedStore());
+			cpu.SetExMemRegValue(cpu.GetIdExRegValue());
+			cpu.SetExMemNeedWriteBack(cpu.GetIdExNeedWriteBack());
+			cpu.SetExMemIndex(cpu.GetIdExIndex());
 		}
 
 		//ID
@@ -218,6 +249,26 @@ int main() {
 		}
 		else
 		{
+			//clear reg
+			cpu.SetIdExTypeR(0);
+			cpu.SetIdExTypeJ(0);
+			cpu.SetIdExTypeI(0);
+			cpu.SetIdExOp(0);
+			cpu.SetIdExRs(0);
+			cpu.SetIdExRt(0);
+			cpu.SetIdExRd(0);
+			cpu.SetIdExShamt(0);
+			cpu.SetIdExFunc(0);
+			cpu.SetIdExImmediate(0);
+			cpu.SetIdExAddress_(0);
+			cpu.SetIdExNeedLoad(0);
+			cpu.SetIdExNeedStore(0);
+			//cpu.SetIdExAddress(0);
+			cpu.SetIdExRegValue(0);
+			cpu.SetIdExNeedWriteBack(0);
+			cpu.SetIdExIndex(0);
+			//cpu.SetIdExWord(0);
+
 			//category instruction loaded in IR
 			switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
 			{
@@ -281,6 +332,9 @@ int main() {
 				//set rd
 				cpu.SetIdExRd(cpu.GetDecoder().GetRd(cpu.GetIr()));
 
+				//set index
+				cpu.SetIdExIndex(cpu.GetDecoder().GetRd(cpu.GetIr()));
+
 				//can rt get from fw
 				if (cpu.GetFw0Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
 				{
@@ -329,6 +383,9 @@ int main() {
 
 				//lock rd
 				cpu.LockReg(cpu.GetDecoder().GetRd(cpu.GetIr()));
+
+				//set need write back
+				cpu.SetIdExNeedWriteBack(1);
 
 				break;
 			case 2:
@@ -401,6 +458,12 @@ int main() {
 					//set rt
 					cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
 
+					//set need write back
+					cpu.SetIdExNeedWriteBack(1);
+
+					//set index
+					cpu.SetIdExIndex(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
 					//can rs get from fw
 					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
 					{
@@ -439,6 +502,12 @@ int main() {
 					//set rt
 					cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
 
+					//set need write back
+					cpu.SetIdExNeedWriteBack(1);
+
+					//set index
+					cpu.SetIdExIndex(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
 					//can rs get from fw
 					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
 					{
@@ -464,7 +533,7 @@ int main() {
 
 					//lock rt
 					cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
-					
+
 					break;
 				case 0x2B:
 					//sw
@@ -489,6 +558,9 @@ int main() {
 						{
 							//set rt
 							cpu.SetIdExRt(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
+
+							//set reg value
+							cpu.SetIdExRegValue(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
 						}
 					}
 
@@ -522,8 +594,6 @@ int main() {
 
 				break;
 			}
-
-			//trans reg
 		}
 
 		//IF
@@ -536,13 +606,13 @@ int main() {
 		}
 		else
 		{
-			if (cpu.GetExMemNeedLoad() == 1 || cpu.GetExMemNeedStore() == 1)
+			if (cpu.GetMemIfAllow() == 0)
 			{
 				//delay
 			}
 			else
 			{
-				//fetch instruction from memory to ir
+				//fetch instruction from memory to IR
 				cpu.SetIr(memory.ReadWord(cpu.GetPc()));
 
 				//modify pc

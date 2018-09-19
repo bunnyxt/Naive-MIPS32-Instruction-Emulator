@@ -168,16 +168,16 @@ public:
 	word GetIdExNeedLoad();
 	void SetIdExNeedStore(word w);
 	word GetIdExNeedStore();
-	void SetIdExAddress(address add);
-	address GetIdExAddress();
+	//void SetIdExAddress(address add);
+	//address GetIdExAddress();
 	void SetIdExRegValue(word w);
 	word GetIdExRegValue();
 	void SetIdExNeedWriteBack(word w);
 	word GetIdExNeedWriteBack();
 	void SetIdExIndex(word w);
 	word GetIdExIndex();
-	void SetIdExWord(word w);
-	word GetIdExWord();
+	//void SetIdExWord(word w);
+	//word GetIdExWord();
 
 	void SetExMemNeedLoad(word w);
 	word GetExMemNeedLoad();
@@ -194,6 +194,8 @@ public:
 	void SetExMemWord(word w);
 	word GetExMemWord();
 
+	void SetMemIfAllow(word w);
+	word GetMemIfAllow();
 	void SetMemWbNeedWriteBack(word w);
 	word GetMemWbNeedWriteBack();
 	void SetMemWbIndex(word w);
@@ -229,11 +231,11 @@ private:
 	Register id_ex_address_;//address part
 	Register id_ex_need_load;//meed load
 	Register id_ex_need_store;//need store
-	Register id_ex_address;//l/s memory address
-	Register id_ex_reg_value;//store to memory word reg
-	Register id_ex_need_write_back;//need write bacl
+	//Register id_ex_address;//l/s memory address
+	Register id_ex_reg_value;//store to memory word reg value
+	Register id_ex_need_write_back;//need write back
 	Register id_ex_index;//write back reg index
-	Register id_ex_word;//write back word
+	//Register id_ex_word;//write back word
 
 	Register ex_mem_need_load;//need load
 	Register ex_mem_need_store;//nees store
@@ -243,6 +245,7 @@ private:
 	Register ex_mem_index;//write back index
 	Register ex_mem_word;//write back word
 
+	Register mem_if_allow;//allow if
 	Register mem_wb_need_write_back;//need write back
 	Register mem_wb_index;//write back reg index
 	Register mem_wb_word;//write back word
