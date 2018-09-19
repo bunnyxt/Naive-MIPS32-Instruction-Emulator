@@ -19,6 +19,8 @@ GeneralPurposeRegisterSet & Cpu::GetGeneralPurposeRegisterSet()
 
 void Cpu::SetPc(address add)
 {
+	cout << "[Cpu] Set register PC with value " << ConvertHelper::AddressToString(add) << "(" << add << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register PC with value " + ConvertHelper::AddressToString(add) + "(" + to_string(add) + ").");
 	pc.Set(add);
 }
 
@@ -29,6 +31,8 @@ address Cpu::GetPc()
 
 void Cpu::SetIr(instruction i)
 {
+	cout << "[Cpu] Set register IR with value " << ConvertHelper::InstructionToString(i) << "(" << i << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IR with value " + ConvertHelper::InstructionToString(i) + "(" + to_string(i) + ").");
 	ir.Set(i);
 }
 
