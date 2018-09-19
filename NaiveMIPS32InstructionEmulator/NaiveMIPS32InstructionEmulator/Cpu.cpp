@@ -7,6 +7,9 @@ Cpu::Cpu()
 	{
 		isReady[i] = false;
 	}
+
+	fw0_index.Set(999);
+	fw1_index.Set(999);
 }
 
 GeneralPurposeRegisterSet & Cpu::GetGeneralPurposeRegisterSet()
@@ -32,6 +35,89 @@ void Cpu::SetIr(instruction i)
 instruction Cpu::GetIr()
 {
 	return ir.Get();
+}
+
+void Cpu::LockReg(int index)
+{
+	if (index >= 0 && index < 32)
+	{
+		//set 1
+		lockMarker.Set(lockMarker.Get() | (1 << index));
+	}
+	else
+	{
+		cout << "Warning! Invalid index " << index << " detected! No register locked in this call." << endl;
+		IOHelper::WriteLog("Warning! Invalid index " + to_string(index) + " detected! No register locked in this call.");
+	}
+}
+
+void Cpu::UnlockReg(int index)
+{
+	if (index >= 0 && index < 32)
+	{
+		//set 0
+		lockMarker.Set(lockMarker.Get() & (~(1 << index)));
+	}
+	else
+	{
+		cout << "Warning! Invalid index " << index << " detected! No register unlocked in this call." << endl;
+		IOHelper::WriteLog("Warning! Invalid index " + to_string(index) + " detected! No register unlocked in this call.");
+	}
+}
+
+bool Cpu::IsRegLocked(int index)
+{
+	if (index >= 0 && index < 32)
+	{
+		//1 locked 0 not locked
+		return (lockMarker.Get() & (1 << index)) >> index;
+	}
+	else
+	{
+		cout << "Warning! Invalid index " << index << " detected! Return false by default." << endl;
+		IOHelper::WriteLog("Warning! Invalid index " + to_string(index) + " detected! Return false by default.");
+		return false;
+	}
+}
+
+void Cpu::SetFw0Value(word w)
+{
+	fw0_value.Set(w);
+}
+
+word Cpu::GetFw0Value()
+{
+	return fw0_value.Get();
+}
+
+void Cpu::SetFw0Index(word w)
+{
+	fw0_index.Set(w);
+}
+
+word Cpu::GetFw0Index()
+{
+	return fw0_index.Get();
+}
+
+void Cpu::SetFw1Value(word w)
+{
+	fw1_value.Set(w);
+}
+
+word Cpu::GetFw1Value()
+{
+	return fw1_value.Get();
+}
+
+void Cpu::SetFw1Index(word w)
+{
+	fw1_index.Set(w);
+}
+
+word Cpu::GetFw1Index()
+{
+	return fw1_index.Get();
 }
 
 Decoder Cpu::GetDecoder()
@@ -139,6 +225,16 @@ word Cpu::GetIdExImmediate()
 	return id_ex_immediate.Get();
 }
 
+void Cpu::SetIdExAddress_(address add)
+{
+	id_ex_address_.Set(add);
+}
+
+address Cpu::GetIdExAddress_()
+{
+	return id_ex_address_.Get();
+}
+
 bool Cpu::IsReady(int index)
 {
 	if (index >= 0 && index < 5)
@@ -205,14 +301,14 @@ address Cpu::GetIdExAddress()
 	return id_ex_address.Get();
 }
 
-void Cpu::SetIdExReg(word w)
+void Cpu::SetIdExRegValue(word w)
 {
-	id_ex_reg.Set(w);
+	id_ex_reg_value.Set(w);
 }
 
-word Cpu::GetIdExReg()
+word Cpu::GetIdExRegValue()
 {
-	return id_ex_reg.Get();
+	return id_ex_reg_value.Get();
 }
 
 void Cpu::SetIdExNeedWriteBack(word w)
@@ -275,14 +371,14 @@ address Cpu::GetExMemAddress()
 	return ex_mem_address.Get();
 }
 
-void Cpu::SetExMemReg(word w)
+void Cpu::SetExMemRegValue(word w)
 {
-	ex_mem_reg.Set(w);
+	ex_mem_reg_value.Set(w);
 }
 
-word Cpu::GetExMemReg()
+word Cpu::GetExMemRegValue()
 {
-	return ex_mem_reg.Get();
+	return ex_mem_reg_value.Get();
 }
 
 void Cpu::SetExMemNeedWriteBack(word w)

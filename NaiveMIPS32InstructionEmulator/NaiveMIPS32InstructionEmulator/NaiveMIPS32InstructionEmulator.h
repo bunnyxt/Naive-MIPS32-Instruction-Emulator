@@ -126,6 +126,20 @@ public:
 	void SetIr(instruction i);
 	instruction GetIr();
 
+	//Caution! Not support twice lock!
+	void LockReg(int index);
+	void UnlockReg(int index);
+	bool IsRegLocked(int index);
+
+	void SetFw0Value(word w);
+	word GetFw0Value();
+	void SetFw0Index(word w);
+	word GetFw0Index();
+	void SetFw1Value(word w);
+	word GetFw1Value();
+	void SetFw1Index(word w);
+	word GetFw1Index();
+
 	Decoder GetDecoder();
 
 	void SetIdExTypeR(word w);
@@ -148,16 +162,16 @@ public:
 	word GetIdExFunc();
 	void SetIdExImmediate(word w);
 	word GetIdExImmediate();
-	void SetIdExAddress(address add);
-	address GetIdExAddress();
+	void SetIdExAddress_(address add);
+	address GetIdExAddress_();
 	void SetIdExNeedLoad(word w);
 	word GetIdExNeedLoad();
 	void SetIdExNeedStore(word w);
 	word GetIdExNeedStore();
 	void SetIdExAddress(address add);
 	address GetIdExAddress();
-	void SetIdExReg(word w);
-	word GetIdExReg();
+	void SetIdExRegValue(word w);
+	word GetIdExRegValue();
 	void SetIdExNeedWriteBack(word w);
 	word GetIdExNeedWriteBack();
 	void SetIdExIndex(word w);
@@ -171,8 +185,8 @@ public:
 	word GetExMemNeedStore();
 	void SetExMemAddress(address add);
 	address GetExMemAddress();
-	void SetExMemReg(word w);
-	word GetExMemReg();
+	void SetExMemRegValue(word w);
+	word GetExMemRegValue();
 	void SetExMemNeedWriteBack(word w);
 	word GetExMemNeedWriteBack();
 	void SetExMemIndex(word w);
@@ -189,6 +203,12 @@ public:
 
 private:
 	bool isReady[5];
+	Register lockMarker;
+
+	Register fw0_value;
+	Register fw0_index;
+	Register fw1_value;
+	Register fw1_index;
 
 	Decoder decoder;
 
@@ -205,12 +225,12 @@ private:
 	Register id_ex_rd;//rd part
 	Register id_ex_shamt;//shamt part
 	Register id_ex_func;//func part
-	Register id_ex_immediate;//func part
-	Register id_ex_address;//func part
+	Register id_ex_immediate;//immediate part
+	Register id_ex_address_;//address part
 	Register id_ex_need_load;//meed load
 	Register id_ex_need_store;//need store
 	Register id_ex_address;//l/s memory address
-	Register id_ex_reg;//store to memory word reg
+	Register id_ex_reg_value;//store to memory word reg
 	Register id_ex_need_write_back;//need write bacl
 	Register id_ex_index;//write back reg index
 	Register id_ex_word;//write back word
@@ -218,7 +238,7 @@ private:
 	Register ex_mem_need_load;//need load
 	Register ex_mem_need_store;//nees store
 	Register ex_mem_address;//l/s memory address
-	Register ex_mem_reg;//store to memory word reg
+	Register ex_mem_reg_value;//store to memory word reg
 	Register ex_mem_need_write_back;//need write back
 	Register ex_mem_index;//write back index
 	Register ex_mem_word;//write back word

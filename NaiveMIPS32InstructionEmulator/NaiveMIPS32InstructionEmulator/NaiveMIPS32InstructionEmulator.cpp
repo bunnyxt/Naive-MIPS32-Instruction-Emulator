@@ -37,7 +37,7 @@ int main() {
 		codeFileIn.open(codeFileName);
 		if (!codeFileIn.is_open())
 		{
-			cout << "Cannot open code file " << codeFileName << "! Please retry..." << endl;
+			cout << "Warning! Cannot open code file " << codeFileName << "! Please retry..." << endl;
 			IOHelper::WriteLog("Fail to open file " + codeFileName + ".");
 		}
 		else
@@ -60,7 +60,7 @@ int main() {
 		memoryDataFileIn.open(memoryDataFileName);
 		if (!memoryDataFileIn.is_open())
 		{
-			cout << "Cannot open memory data file " << memoryDataFileName << "! Please retry..." << endl;
+			cout << "Warning! Cannot open memory data file " << memoryDataFileName << "! Please retry..." << endl;
 			IOHelper::WriteLog("Fail to open file " + memoryDataFileName + ".");
 		}
 		else
@@ -83,7 +83,7 @@ int main() {
 		registerDataFileIn.open(registerDataFileName);
 		if (!registerDataFileIn.is_open())
 		{
-			cout << "Cannot open register data file " << registerDataFileName << "! Please retry..." << endl;
+			cout << "Warning! Cannot open register data file " << registerDataFileName << "! Please retry..." << endl;
 			IOHelper::WriteLog("Fail to open file " + registerDataFileName + ".");
 		}
 		else
@@ -151,9 +151,13 @@ int main() {
 			}
 			else
 			{
+				//write back
 				cout << "Write word " << ConvertHelper::WordToString(cpu.GetMemWbWord()) << " back to r" << cpu.GetMemWbIndex() << "." << endl;
 				IOHelper::WriteLog("Write word " + ConvertHelper::WordToString(cpu.GetMemWbWord()) + " back to r" + to_string(cpu.GetMemWbIndex()) + ".");
 				cpu.GetGeneralPurposeRegisterSet().Set(cpu.GetMemWbIndex(), cpu.GetMemWbWord());
+
+				//unlock reg
+				cpu.UnlockReg(cpu.GetMemWbIndex());
 			}
 		}
 
@@ -176,7 +180,7 @@ int main() {
 			if (cpu.GetExMemNeedStore() != 0)
 			{
 				//TODO log
-				memory.WriteWord(cpu.GetExMemAddress(), cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetExMemReg()));
+				memory.WriteWord(cpu.GetExMemAddress(), cpu.GetExMemRegValue());
 			}
 
 			//TODO log
@@ -214,81 +218,310 @@ int main() {
 		}
 		else
 		{
-			//get ir
-			switch ((cpu.GetIr() & 0xFC000000) >> 26)
+			//category instruction loaded in IR
+			switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
 			{
 			case 0:
 				//type R
-				switch ((cpu.GetIr() & 0x00000003F))
+				cpu.SetIdExTypeR(1);
+
+				//set op
+				cpu.SetIdExOp(0);
+
+				//set func
+				switch (cpu.GetDecoder().GetFunc(cpu.GetIr()))
 				{
 				case 0x21:
 					//addu
+					cpu.SetIdExFunc(0x21);
 					break;
 				case 0x23:
 					//subu
+					cpu.SetIdExFunc(0x23);
 					break;
 				case 0x24:
 					//and
+					cpu.SetIdExFunc(0x24);
 					break;
 				case 0x25:
 					//or
+					cpu.SetIdExFunc(0x25);
 					break;
 				case 0x26:
 					//xor
+					cpu.SetIdExFunc(0x26);
 					break;
 				case 0x27:
 					//nor
+					cpu.SetIdExFunc(0x27);
 					break;
 				case 0x00:
 					//sll
+					cpu.SetIdExFunc(0x00);
 					break;
 				case 0x02:
 					//srl
+					cpu.SetIdExFunc(0x02);
 					break;
 				case 0x08:
 					//jr
+					cpu.SetIdExFunc(0x08);
 					break;
 				default:
 					//not support 
+					cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
+					IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
+					exit(0);
 					break;
 				}
+
+				//set shamt
+				cpu.SetIdExShamt(cpu.GetDecoder().GetShamt(cpu.GetIr()));
+
+				//set rd
+				cpu.SetIdExRd(cpu.GetDecoder().GetRd(cpu.GetIr()));
+
+				//can rt get from fw
+				if (cpu.GetFw0Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+				{
+					cpu.SetIdExRt(cpu.GetFw0Value());
+				}
+				else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+				{
+					cpu.SetIdExRt(cpu.GetFw1Value());
+				}
+				else
+				{
+					//is reg locked
+					if (cpu.IsRegLocked(cpu.GetDecoder().GetRt(cpu.GetIr())))
+					{
+						//delay
+					}
+					else
+					{
+						//set rt
+						cpu.SetIdExRt(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
+					}
+				}
+
+				//can rs get from fw
+				if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+				{
+					cpu.SetIdExRs(cpu.GetFw0Value());
+				}
+				else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+				{
+					cpu.SetIdExRs(cpu.GetFw1Value());
+				}
+				else
+				{
+					//is reg locked
+					if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+					{
+						//delay
+					}
+					else
+					{
+						//set rs
+						cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+					}
+				}
+
+				//lock rd
+				cpu.LockReg(cpu.GetDecoder().GetRd(cpu.GetIr()));
+
 				break;
 			case 2:
 				//type J
+				cpu.SetIdExTypeJ(1);
+
+				//set op
+				cpu.SetIdExOp(0x02);
+
+				//set address_
+				cpu.SetIdExAddress_(cpu.GetDecoder().GetAddress(cpu.GetIr()));
+
 				break;
 			default:
 				//case I
-				switch ((cpu.GetIr() & 0xFC000000) >> 26)
+				cpu.SetIdExTypeI(1);
+
+				//set op
+				switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
 				{
 				case 0x0C:
 					//andi
+					cpu.SetIdExOp(0x0C);
 					break;
 				case 0x0D:
 					//ori
+					cpu.SetIdExOp(0x0D);
 					break;
 				case 0x0E:
 					//xori
+					cpu.SetIdExOp(0x0E);
 					break;
 				case 0x04:
 					//beq
+					cpu.SetIdExOp(0x04);
 					break;
 				case 0x05:
 					//bne
+					cpu.SetIdExOp(0x05);
 					break;
 				case 0x23:
 					//lw
+					cpu.SetIdExOp(0x23);
+					cpu.SetIdExNeedLoad(1);
 					break;
 				case 0x2B:
 					//sw
+					cpu.SetIdExOp(0x2B);
+					cpu.SetIdExNeedStore(1);
 					break;
 				default:
 					//not support
+					cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
+					IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
+					exit(0);
 					break;
 				}
+
+				//set immediate
+				cpu.SetIdExImmediate(cpu.GetDecoder().GetImmediate(cpu.GetIr()));
+
+				//rs rt related
+				switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
+				{
+				case 0x0C:
+				case 0x0D:
+				case 0x0E:
+					//andi ori xori
+
+					//set rt
+					cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+					//can rs get from fw
+					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cpu.SetIdExRs(cpu.GetFw0Value());
+					}
+					else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cpu.SetIdExRs(cpu.GetFw1Value());
+					}
+					else
+					{
+						//is reg locked
+						if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+						{
+							//delay
+						}
+						else
+						{
+							//set rs
+							cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+						}
+					}
+
+					//lock rt
+					cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+					break;
+				case 0x04:
+				case 0x05:
+					//beq bne
+
+					break;
+				case 0x23:
+					//lw
+
+					//set rt
+					cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+					//can rs get from fw
+					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cpu.SetIdExRs(cpu.GetFw0Value());
+					}
+					else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cpu.SetIdExRs(cpu.GetFw1Value());
+					}
+					else
+					{
+						//is reg locked
+						if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+						{
+							//delay
+						}
+						else
+						{
+							//set rs
+							cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+						}
+					}
+
+					//lock rt
+					cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
+					
+					break;
+				case 0x2B:
+					//sw
+
+					//can rt get from fw
+					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+					{
+						cpu.SetIdExRt(cpu.GetFw0Value());
+					}
+					else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+					{
+						cpu.SetIdExRt(cpu.GetFw1Value());
+					}
+					else
+					{
+						//is reg locked
+						if (cpu.IsRegLocked(cpu.GetDecoder().GetRt(cpu.GetIr())))
+						{
+							//delay
+						}
+						else
+						{
+							//set rt
+							cpu.SetIdExRt(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
+						}
+					}
+
+					//can rs get from fw
+					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cpu.SetIdExRs(cpu.GetFw0Value());
+					}
+					else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cpu.SetIdExRs(cpu.GetFw1Value());
+					}
+					else
+					{
+						//is reg locked
+						if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+						{
+							//delay
+						}
+						else
+						{
+							//set rs
+							cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+						}
+					}
+
+					break;
+				default:
+					break;
+				}
+
 				break;
 			}
-
-			//decode and set all reg
 
 			//trans reg
 		}
@@ -313,7 +546,7 @@ int main() {
 				cpu.SetIr(memory.ReadWord(cpu.GetPc()));
 
 				//modify pc
-				cpu.SetPc = cpu.GetPc() + 4;
+				cpu.SetPc(cpu.GetPc() + 4);
 			}
 		}
 
