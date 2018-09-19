@@ -50,6 +50,7 @@ public:
 	static string AddressToString(address a);
 	static string WordToString(word w);
 	static string SeperateString(string s, int interval = 4, char seperator = ' ');
+	static word GetSignExtendWord(word w, int length = 16);
 
 private:
 	static string unsignedIntToString(unsigned int ui);
@@ -92,7 +93,10 @@ private:
 
 //Alu class
 class Alu {
-
+public:
+	word CalculateR(word rs, word rt, word shamt, word func);
+	word CalculateI(word op, word rs, word rt, word immediate);
+	word CalculateJ(word op, word address);
 };
 
 //Decoder class
@@ -141,6 +145,7 @@ public:
 	word GetFw1Index();
 
 	Decoder GetDecoder();
+	Alu GetAlu();
 
 	void SetIdExTypeR(word w);
 	word GetIdExTypeR();
@@ -213,6 +218,7 @@ private:
 	Register fw1_index;
 
 	Decoder decoder;
+	Alu alu;
 
 	GeneralPurposeRegisterSet gprs;
 	Register pc;

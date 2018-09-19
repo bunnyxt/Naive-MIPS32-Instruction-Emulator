@@ -125,6 +125,11 @@ Decoder Cpu::GetDecoder()
 	return decoder;
 }
 
+Alu Cpu::GetAlu()
+{
+	return alu;
+}
+
 void Cpu::SetIdExTypeR(word w)
 {
 	id_ex_type_R.Set(w);

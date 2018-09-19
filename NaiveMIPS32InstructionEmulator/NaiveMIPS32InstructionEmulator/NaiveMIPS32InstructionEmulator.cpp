@@ -212,7 +212,8 @@ int main() {
 			//get instruction type
 			if (cpu.GetIdExTypeR() == 1)
 			{
-
+				//set word
+				cpu.SetExMemWord(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
 			}
 			else if (cpu.GetIdExTypeI() == 1)
 			{
@@ -224,12 +225,11 @@ int main() {
 			}
 			else
 			{
-
+				//not support
+				cout << "Error! No valid instruction type detected! Now exit..." << endl;
+				IOHelper::WriteLog("Error! No valid instruction type detected! Now exit...");
+				exit(0);
 			}
-
-			//get ex type
-
-			//get numbers and send them to alu or others
 
 			//trans regs
 			cpu.SetExMemNeedLoad(cpu.GetIdExNeedLoad());

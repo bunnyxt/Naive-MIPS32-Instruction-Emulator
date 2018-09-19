@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Alu.cpp" />
     <ClCompile Include="ConvertHelper.cpp" />
     <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="Decoder.cpp" />

@@ -23,6 +23,18 @@ string ConvertHelper::SeperateString(string s, int interval, char seperator)
 	return s;
 }
 
+word ConvertHelper::GetSignExtendWord(word w, int length)
+{
+	if (((w & (1 << (length - 1))) >> (length - 1)) == 1)
+	{
+		for (int i = length; i < 32; i++)
+		{
+			w = w | (1 << i);
+		}
+	}
+	return w;
+}
+
 string ConvertHelper::unsignedIntToString(unsigned int ui)
 {
 	string s = "00000000000000000000000000000000";
