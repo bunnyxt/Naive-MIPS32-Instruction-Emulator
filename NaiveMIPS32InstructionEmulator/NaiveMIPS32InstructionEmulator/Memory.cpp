@@ -1,11 +1,17 @@
 #include "NaiveMIPS32InstructionEmulator.h"
 
 Memory::Memory() {
+	cout << "[Memory] Initialize Memory..." << endl;
+	IOHelper::WriteLog("[Memory] Initialize Memory...");
+
 	//initialize memory data
 	for (int i = 0; i < 4096; i++)//
 	{
 		data[i] = 0;
 	}
+
+	cout << "[Memory] Memory initialized." << endl;
+	IOHelper::WriteLog("[Memory] Memory initialized.");
 }
 
 word Memory::ReadWord(address add)

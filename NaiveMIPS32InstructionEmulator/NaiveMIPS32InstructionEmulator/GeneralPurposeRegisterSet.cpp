@@ -2,7 +2,11 @@
 
 GeneralPurposeRegisterSet::GeneralPurposeRegisterSet()
 {
+	cout << "[GeneralPurposeRegisterSet] Initialize GeneralPurposeRegisterSet..." << endl;
+	IOHelper::WriteLog("[GeneralPurposeRegisterSet] Initialize GeneralPurposeRegisterSet...");
 
+	cout << "[GeneralPurposeRegisterSet] GeneralPurposeRegisterSet initialized." << endl;
+	IOHelper::WriteLog("[GeneralPurposeRegisterSet] GeneralPurposeRegisterSet initialized.");
 }
 
 word GeneralPurposeRegisterSet::Get(int index)

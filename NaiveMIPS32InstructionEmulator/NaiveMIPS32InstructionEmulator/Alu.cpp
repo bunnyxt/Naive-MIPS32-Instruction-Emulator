@@ -1,5 +1,14 @@
 #include "NaiveMIPS32InstructionEmulator.h"
 
+Alu::Alu()
+{
+	cout << "[Alu] Initialize Alu..." << endl;
+	IOHelper::WriteLog("[Alu] Initialize Alu...");
+
+	cout << "[Alu] Alu initialized." << endl;
+	IOHelper::WriteLog("[Alu] Alu initialized.");
+}
+
 word Alu::CalculateR(word rs, word rt, word shamt, word func)
 {
 	word result = 0;

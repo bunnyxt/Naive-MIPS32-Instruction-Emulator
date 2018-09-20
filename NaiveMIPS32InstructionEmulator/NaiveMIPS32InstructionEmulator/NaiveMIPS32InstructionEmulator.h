@@ -95,6 +95,7 @@ private:
 //Alu class
 class Alu {
 public:
+	Alu();
 	word CalculateR(word rs, word rt, word shamt, word func);
 	word CalculateI(word op, word rs, word rt, word immediate);
 	word CalculateJ(word op, word address);
@@ -103,6 +104,7 @@ public:
 //Decoder class
 class Decoder {
 public:
+	Decoder();
 	word GetOp(instruction i);
 	word GetRs(instruction i);
 	word GetRt(instruction i);
@@ -122,8 +124,15 @@ public:
 	Cpu();
 
 	bool IsReady(int index);
-	void MoveOnReady();
-	void DropReady(int index);
+	void SetReady(int index);
+	void SetNotReady(int index);
+	void SetNewReady();
+	//void DropReady(int index);
+
+	bool IsRunDone(int index);
+	void SetRunDone(int index);
+	void SetRunInterrupted(int index);
+	void ResetRunStatus();
 
 	GeneralPurposeRegisterSet& GetGeneralPurposeRegisterSet();
 	void SetPc(address add);
@@ -131,15 +140,19 @@ public:
 	void SetIr(instruction i);
 	instruction GetIr();
 
-	//Caution! Not support twice lock!
+	//Caution! Not support lock 1 register twice!
 	void LockReg(int index);
 	void UnlockReg(int index);
 	bool IsRegLocked(int index);
 
+	bool IsFw0Vacant();
+	void SetFw0Vacant();
 	void SetFw0Value(word w);
 	word GetFw0Value();
 	void SetFw0Index(word w);
 	word GetFw0Index();
+	bool IsFw1Vacant();
+	void SetFw1Vacant();
 	void SetFw1Value(word w);
 	word GetFw1Value();
 	void SetFw1Index(word w);
@@ -215,7 +228,8 @@ public:
 	word GetMemWbWord();
 
 private:
-	bool isReady[5];
+	Register isReady;
+	Register runStatus;
 	Register lockMarker;
 
 	Register fw0_value;

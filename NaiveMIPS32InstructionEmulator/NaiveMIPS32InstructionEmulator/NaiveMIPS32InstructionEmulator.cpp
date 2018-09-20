@@ -21,8 +21,12 @@ int main() {
 	}
 
 	//initialize components
+	cout << "Now initialize components..." << endl;
+	IOHelper::WriteLog("Now initialize components...");
 	Cpu cpu;
 	Memory memory;
+	cout << "Components initialized.\n" << endl;
+	IOHelper::WriteLog("Components initialized.\n");
 
 	//load code & data
 	string codeFileName, memoryDataFileName, registerDataFileName;
@@ -132,157 +136,134 @@ int main() {
 		cout << "========== Now start clock " << clockNumber << "... ==========" << endl;
 		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " ==========");
 
-		bool readyStateChangedFlag = false;
+		cpu.ResetRunStatus();
 
-		//WB
-		cout << "WB" << endl;
-		IOHelper::WriteLog("WB");
-		if (!cpu.IsReady(4))
+		try
 		{
-			cout << "No work now." << endl;
-			IOHelper::WriteLog("No work now.");
-		}
-		else
-		{
-			if (cpu.GetMemWbNeedWriteBack() == 0)
+			//WB
+			cout << "WB" << endl;
+			IOHelper::WriteLog("WB");
+			if (!cpu.IsReady(4))
 			{
-				cout << "No need now." << endl;
-				IOHelper::WriteLog("No need now.");
+				cout << "No work now." << endl;
+				IOHelper::WriteLog("No work now.");
+				cpu.SetRunInterrupted(4);
 			}
 			else
 			{
-				//write back
-				cout << "Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << "(" << cpu.GetMemWbWord() << ") back to r" << cpu.GetMemWbIndex() << "." << endl;
-				IOHelper::WriteLog("Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + "(" + to_string(cpu.GetMemWbWord()) + ") back to r" + to_string(cpu.GetMemWbIndex()) + ".");
-				cpu.GetGeneralPurposeRegisterSet().Set(cpu.GetMemWbIndex(), cpu.GetMemWbWord());
-
-				//unlock reg
-				cpu.UnlockReg(cpu.GetMemWbIndex());
-
-				//free fw
-				if (cpu.GetFw0Index() == cpu.GetMemWbIndex())
+				if (cpu.GetMemWbNeedWriteBack() == 0)
 				{
-					cpu.SetFw0Index(999);
-				}
-				else if (cpu.GetFw1Index() == cpu.GetMemWbIndex())
-				{
-					cpu.SetFw1Index(999);
+					cout << "No need now." << endl;
+					IOHelper::WriteLog("No need now.");
 				}
 				else
 				{
-					//no index from found, error occurred
+					//write back
+					cout << "Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << "(" << cpu.GetMemWbWord() << ") back to r" << cpu.GetMemWbIndex() << "." << endl;
+					IOHelper::WriteLog("Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + "(" + to_string(cpu.GetMemWbWord()) + ") back to r" + to_string(cpu.GetMemWbIndex()) + ".");
+					cpu.GetGeneralPurposeRegisterSet().Set(cpu.GetMemWbIndex(), cpu.GetMemWbWord());
+
+					//unlock reg
+					cpu.UnlockReg(cpu.GetMemWbIndex());
+
+					//free fw
+					if (cpu.GetFw0Index() == cpu.GetMemWbIndex())
+					{
+						cpu.SetFw0Vacant();
+					}
+					else if (cpu.GetFw1Index() == cpu.GetMemWbIndex())
+					{
+						cpu.SetFw1Vacant();
+					}
+					else
+					{
+						//no index from found, error occurred
+					}
 				}
 			}
-		}
 
-		//MEM
-		cout << "MEM" << endl;
-		IOHelper::WriteLog("MEM");
-		if (!cpu.IsReady(3))
-		{
-			cout << "No work now." << endl;
-			IOHelper::WriteLog("No work now.");
-		}
-		else
-		{
-			if (cpu.GetExMemNeedLoad() != 0)
+			//MEM
+			cout << "MEM" << endl;
+			IOHelper::WriteLog("MEM");
+			if (!cpu.IsReady(3))
 			{
-				//TODO log
-				cpu.SetMemWbWord(memory.ReadWord(cpu.GetExMemAddress()));
-
-				//not allow IF
-				cpu.SetMemIfAllow(1);
-
-				//set FW
-				if (cpu.GetFw0Index() == 999)
-				{
-					cpu.SetFw0Index(cpu.GetMemWbIndex());
-					cpu.SetFw0Value(cpu.GetMemWbWord());
-				}
-				else if (cpu.GetFw1Index() == 999)
-				{
-					cpu.SetFw1Index(cpu.GetMemWbIndex());
-					cpu.SetFw1Value(cpu.GetMemWbWord());
-				}
-				else
-				{
-					//no free fw now, fail to unlock before
-				}
-			}
-			else if (cpu.GetExMemNeedStore() != 0)
-			{
-				//TODO log
-				memory.WriteWord(cpu.GetExMemAddress(), cpu.GetExMemRegValue());
-
-				//not allow IF
-				cpu.SetMemIfAllow(1);
-
-				cpu.SetMemWbWord(cpu.GetExMemWord());
+				cout << "No work now." << endl;
+				IOHelper::WriteLog("No work now.");
+				cpu.SetRunInterrupted(3);
 			}
 			else
 			{
-				//allow IF
-				cpu.SetMemIfAllow(0);
-
-				cpu.SetMemWbWord(cpu.GetExMemWord());
-			}
-
-			//TODO log
-			cpu.SetMemWbNeedWriteBack(cpu.GetExMemNeedWriteBack());
-			cpu.SetMemWbIndex(cpu.GetExMemIndex());
-		}
-
-		//EX
-		cout << "EX" << endl;
-		IOHelper::WriteLog("EX");
-		if (!cpu.IsReady(2))
-		{
-			cout << "No work now." << endl;
-			IOHelper::WriteLog("No work now.");
-		}
-		else
-		{
-			//get instruction type
-			if (cpu.GetIdExTypeR() == 1)
-			{
-				//set word
-				cpu.SetExMemWord(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
-
-				//set FW
-				if (cpu.GetFw0Index() == 999)
+				if (cpu.GetExMemNeedLoad() != 0)
 				{
-					cpu.SetFw0Index(cpu.GetIdExIndex());
-					cpu.SetFw0Value(cpu.GetExMemWord());
-				}
-				else if (cpu.GetFw1Index() == 999)
-				{
-					cpu.SetFw1Index(cpu.GetIdExIndex());
-					cpu.SetFw1Value(cpu.GetExMemWord());
-				}
-				else
-				{
-					//no free fw now, fail to unlock before
-				}
-			}
-			else if (cpu.GetIdExTypeI() == 1)
-			{
-				switch (cpu.GetIdExOp())
-				{
-				case 0x0C:
-				case 0x0D:
-				case 0x0E:
-					//andi ori xori
+					//TODO log
+					cpu.SetMemWbWord(memory.ReadWord(cpu.GetExMemAddress()));
 
-					//set word
-					cpu.SetExMemWord(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+					//not allow IF
+					cpu.SetMemIfAllow(1);
 
 					//set FW
-					if (cpu.GetFw0Index() == 999)
+					if (cpu.IsFw0Vacant())
+					{
+						cpu.SetFw0Index(cpu.GetMemWbIndex());
+						cpu.SetFw0Value(cpu.GetMemWbWord());
+					}
+					else if (cpu.IsFw1Vacant())
+					{
+						cpu.SetFw1Index(cpu.GetMemWbIndex());
+						cpu.SetFw1Value(cpu.GetMemWbWord());
+					}
+					else
+					{
+						//no free fw now, fail to unlock before
+					}
+				}
+				else if (cpu.GetExMemNeedStore() != 0)
+				{
+					//TODO log
+					memory.WriteWord(cpu.GetExMemAddress(), cpu.GetExMemRegValue());
+
+					//not allow IF
+					cpu.SetMemIfAllow(1);
+
+					cpu.SetMemWbWord(cpu.GetExMemWord());
+				}
+				else
+				{
+					//allow IF
+					cpu.SetMemIfAllow(0);
+
+					cpu.SetMemWbWord(cpu.GetExMemWord());
+				}
+
+				//TODO log
+				cpu.SetMemWbNeedWriteBack(cpu.GetExMemNeedWriteBack());
+				cpu.SetMemWbIndex(cpu.GetExMemIndex());
+			}
+
+			//EX
+			cout << "EX" << endl;
+			IOHelper::WriteLog("EX");
+			if (!cpu.IsReady(2))
+			{
+				cout << "No work now." << endl;
+				IOHelper::WriteLog("No work now.");
+				cpu.SetRunInterrupted(2);
+			}
+			else
+			{
+				//get instruction type
+				if (cpu.GetIdExTypeR() == 1)
+				{
+					//set word
+					cpu.SetExMemWord(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
+
+					//set FW
+					if (cpu.IsFw0Vacant())
 					{
 						cpu.SetFw0Index(cpu.GetIdExIndex());
 						cpu.SetFw0Value(cpu.GetExMemWord());
 					}
-					else if (cpu.GetFw1Index() == 999)
+					else if (cpu.IsFw1Vacant())
 					{
 						cpu.SetFw1Index(cpu.GetIdExIndex());
 						cpu.SetFw1Value(cpu.GetExMemWord());
@@ -291,355 +272,181 @@ int main() {
 					{
 						//no free fw now, fail to unlock before
 					}
-
-					break;
-				case 0x04:
-				case 0x05:
-					//beq bne
-
-					//TODO
-
-					break;
-				case 0x23:
-					//lw
-
-					//set address
-					cpu.SetExMemAddress(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
-
-					break;
-				case 0x2B:
-					//sw
-
-					//set address
-					cpu.SetExMemAddress(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
-
-					break;
-				default:
-					break;
 				}
-			}
-			else if (cpu.GetIdExTypeJ() == 1)
-			{
+				else if (cpu.GetIdExTypeI() == 1)
+				{
+					switch (cpu.GetIdExOp())
+					{
+					case 0x0C:
+					case 0x0D:
+					case 0x0E:
+						//andi ori xori
 
+						//set word
+						cpu.SetExMemWord(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+
+						//set FW
+						if (cpu.IsFw0Vacant())
+						{
+							cpu.SetFw0Index(cpu.GetIdExIndex());
+							cpu.SetFw0Value(cpu.GetExMemWord());
+						}
+						else if (cpu.IsFw1Vacant())
+						{
+							cpu.SetFw1Index(cpu.GetIdExIndex());
+							cpu.SetFw1Value(cpu.GetExMemWord());
+						}
+						else
+						{
+							//no free fw now, fail to unlock before
+						}
+
+						break;
+					case 0x04:
+					case 0x05:
+						//beq bne
+
+						//TODO
+
+						break;
+					case 0x23:
+						//lw
+
+						//set address
+						cpu.SetExMemAddress(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+
+						break;
+					case 0x2B:
+						//sw
+
+						//set address
+						cpu.SetExMemAddress(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+
+						break;
+					default:
+						break;
+					}
+				}
+				else if (cpu.GetIdExTypeJ() == 1)
+				{
+
+				}
+				else
+				{
+					//not support
+					cout << "Error! No valid instruction type detected! Now exit..." << endl;
+					IOHelper::WriteLog("Error! No valid instruction type detected! Now exit...");
+					exit(0);
+				}
+
+				//trans regs
+				cpu.SetExMemNeedLoad(cpu.GetIdExNeedLoad());
+				cpu.SetExMemNeedStore(cpu.GetIdExNeedStore());
+				cpu.SetExMemRegValue(cpu.GetIdExRegValue());
+				cpu.SetExMemNeedWriteBack(cpu.GetIdExNeedWriteBack());
+				cpu.SetExMemIndex(cpu.GetIdExIndex());
+			}
+
+			//ID
+			cout << "ID" << endl;
+			IOHelper::WriteLog("ID");
+			if (!cpu.IsReady(1))
+			{
+				cout << "No work now." << endl;
+				IOHelper::WriteLog("No work now.");
+				cpu.SetRunInterrupted(1);
 			}
 			else
 			{
-				//not support
-				cout << "Error! No valid instruction type detected! Now exit..." << endl;
-				IOHelper::WriteLog("Error! No valid instruction type detected! Now exit...");
-				exit(0);
-			}
-
-			//trans regs
-			cpu.SetExMemNeedLoad(cpu.GetIdExNeedLoad());
-			cpu.SetExMemNeedStore(cpu.GetIdExNeedStore());
-			cpu.SetExMemRegValue(cpu.GetIdExRegValue());
-			cpu.SetExMemNeedWriteBack(cpu.GetIdExNeedWriteBack());
-			cpu.SetExMemIndex(cpu.GetIdExIndex());
-		}
-
-		//ID
-		cout << "ID" << endl;
-		IOHelper::WriteLog("ID");
-		if (!cpu.IsReady(1))
-		{
-			cout << "No work now." << endl;
-			IOHelper::WriteLog("No work now.");
-		}
-		else
-		{
-			//clear reg
-			cout << "Now clear regsiters..." << endl;
-			IOHelper::WriteLog("Now clear registers...");
-			cpu.SetIdExTypeR(0);
-			cpu.SetIdExTypeJ(0);
-			cpu.SetIdExTypeI(0);
-			cpu.SetIdExOp(0);
-			cpu.SetIdExRs(0);
-			cpu.SetIdExRt(0);
-			cpu.SetIdExRd(0);
-			cpu.SetIdExShamt(0);
-			cpu.SetIdExFunc(0);
-			cpu.SetIdExImmediate(0);
-			cpu.SetIdExAddress_(0);
-			cpu.SetIdExNeedLoad(0);
-			cpu.SetIdExNeedStore(0);
-			//cpu.SetIdExAddress(0);
-			cpu.SetIdExRegValue(0);
-			cpu.SetIdExNeedWriteBack(0);
-			cpu.SetIdExIndex(0);
-			//cpu.SetIdExWord(0);
-			cout << "Clear registers done." << endl;
-			IOHelper::WriteLog("Clear registers done.");
-
-			//category instruction loaded in IR
-			switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
-			{
-			case 0:
-				//type R
-				cpu.SetIdExTypeR(1);
-
-				//set op
+				//clear reg
+				cout << "Now clear regsiters..." << endl;
+				IOHelper::WriteLog("Now clear registers...");
+				cpu.SetIdExTypeR(0);
+				cpu.SetIdExTypeJ(0);
+				cpu.SetIdExTypeI(0);
 				cpu.SetIdExOp(0);
+				cpu.SetIdExRs(0);
+				cpu.SetIdExRt(0);
+				cpu.SetIdExRd(0);
+				cpu.SetIdExShamt(0);
+				cpu.SetIdExFunc(0);
+				cpu.SetIdExImmediate(0);
+				cpu.SetIdExAddress_(0);
+				cpu.SetIdExNeedLoad(0);
+				cpu.SetIdExNeedStore(0);
+				//cpu.SetIdExAddress(0);
+				cpu.SetIdExRegValue(0);
+				cpu.SetIdExNeedWriteBack(0);
+				cpu.SetIdExIndex(0);
+				//cpu.SetIdExWord(0);
+				cout << "Clear registers done." << endl;
+				IOHelper::WriteLog("Clear registers done.");
 
-				//set func
-				switch (cpu.GetDecoder().GetFunc(cpu.GetIr()))
-				{
-				case 0x21:
-					//addu
-					cpu.SetIdExFunc(0x21);
-					break;
-				case 0x23:
-					//subu
-					cpu.SetIdExFunc(0x23);
-					break;
-				case 0x24:
-					//and
-					cpu.SetIdExFunc(0x24);
-					break;
-				case 0x25:
-					//or
-					cpu.SetIdExFunc(0x25);
-					break;
-				case 0x26:
-					//xor
-					cpu.SetIdExFunc(0x26);
-					break;
-				case 0x27:
-					//nor
-					cpu.SetIdExFunc(0x27);
-					break;
-				case 0x00:
-					//sll
-					cpu.SetIdExFunc(0x00);
-					break;
-				case 0x02:
-					//srl
-					cpu.SetIdExFunc(0x02);
-					break;
-				case 0x08:
-					//jr
-					cpu.SetIdExFunc(0x08);
-					break;
-				default:
-					//not support 
-					cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
-					IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
-					exit(0);
-					break;
-				}
-
-				//set shamt
-				cpu.SetIdExShamt(cpu.GetDecoder().GetShamt(cpu.GetIr()));
-
-				//set rd
-				cpu.SetIdExRd(cpu.GetDecoder().GetRd(cpu.GetIr()));
-
-				//set index
-				cpu.SetIdExIndex(cpu.GetDecoder().GetRd(cpu.GetIr()));
-
-				//can rt get from fw
-				if (cpu.GetFw0Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
-				{
-					cpu.SetIdExRt(cpu.GetFw0Value());
-				}
-				else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
-				{
-					cpu.SetIdExRt(cpu.GetFw1Value());
-				}
-				else
-				{
-					//is reg locked
-					if (cpu.IsRegLocked(cpu.GetDecoder().GetRt(cpu.GetIr())))
-					{
-						//delay
-					}
-					else
-					{
-						//set rt
-						cpu.SetIdExRt(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
-					}
-				}
-
-				//can rs get from fw
-				if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
-				{
-					cpu.SetIdExRs(cpu.GetFw0Value());
-				}
-				else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
-				{
-					cpu.SetIdExRs(cpu.GetFw1Value());
-				}
-				else
-				{
-					//is reg locked
-					if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
-					{
-						//delay
-					}
-					else
-					{
-						//set rs
-						cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
-					}
-				}
-
-				//lock rd
-				cpu.LockReg(cpu.GetDecoder().GetRd(cpu.GetIr()));
-
-				//set need write back
-				cpu.SetIdExNeedWriteBack(1);
-
-				break;
-			case 2:
-				//type J
-				cpu.SetIdExTypeJ(1);
-
-				//set op
-				cpu.SetIdExOp(0x02);
-
-				//set address_
-				cpu.SetIdExAddress_(cpu.GetDecoder().GetAddress(cpu.GetIr()));
-
-				break;
-			default:
-				//case I
-				cpu.SetIdExTypeI(1);
-
-				//set op
+				//category instruction loaded in IR
 				switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
 				{
-				case 0x0C:
-					//andi
-					cpu.SetIdExOp(0x0C);
-					break;
-				case 0x0D:
-					//ori
-					cpu.SetIdExOp(0x0D);
-					break;
-				case 0x0E:
-					//xori
-					cpu.SetIdExOp(0x0E);
-					break;
-				case 0x04:
-					//beq
-					cpu.SetIdExOp(0x04);
-					break;
-				case 0x05:
-					//bne
-					cpu.SetIdExOp(0x05);
-					break;
-				case 0x23:
-					//lw
-					cpu.SetIdExOp(0x23);
-					cpu.SetIdExNeedLoad(1);
-					break;
-				case 0x2B:
-					//sw
-					cpu.SetIdExOp(0x2B);
-					cpu.SetIdExNeedStore(1);
-					break;
-				default:
-					//not support
-					cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
-					IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
-					exit(0);
-					break;
-				}
+				case 0:
+					//type R
+					cpu.SetIdExTypeR(1);
 
-				//set immediate
-				cpu.SetIdExImmediate(cpu.GetDecoder().GetImmediate(cpu.GetIr()));
+					//set op
+					cpu.SetIdExOp(0);
 
-				//rs rt related
-				switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
-				{
-				case 0x0C:
-				case 0x0D:
-				case 0x0E:
-					//andi ori xori
+					//set func
+					switch (cpu.GetDecoder().GetFunc(cpu.GetIr()))
+					{
+					case 0x21:
+						//addu
+						cpu.SetIdExFunc(0x21);
+						break;
+					case 0x23:
+						//subu
+						cpu.SetIdExFunc(0x23);
+						break;
+					case 0x24:
+						//and
+						cpu.SetIdExFunc(0x24);
+						break;
+					case 0x25:
+						//or
+						cpu.SetIdExFunc(0x25);
+						break;
+					case 0x26:
+						//xor
+						cpu.SetIdExFunc(0x26);
+						break;
+					case 0x27:
+						//nor
+						cpu.SetIdExFunc(0x27);
+						break;
+					case 0x00:
+						//sll
+						cpu.SetIdExFunc(0x00);
+						break;
+					case 0x02:
+						//srl
+						cpu.SetIdExFunc(0x02);
+						break;
+					case 0x08:
+						//jr
+						cpu.SetIdExFunc(0x08);
+						break;
+					default:
+						//not support 
+						cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
+						IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
+						exit(0);
+						break;
+					}
 
-					//set rt
-					cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
+					//set shamt
+					cpu.SetIdExShamt(cpu.GetDecoder().GetShamt(cpu.GetIr()));
 
-					//set need write back
-					cpu.SetIdExNeedWriteBack(1);
+					//set rd
+					cpu.SetIdExRd(cpu.GetDecoder().GetRd(cpu.GetIr()));
 
 					//set index
-					cpu.SetIdExIndex(cpu.GetDecoder().GetRt(cpu.GetIr()));
-
-					//can rs get from fw
-					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
-					{
-						cpu.SetIdExRs(cpu.GetFw0Value());
-					}
-					else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
-					{
-						cpu.SetIdExRs(cpu.GetFw1Value());
-					}
-					else
-					{
-						//is reg locked
-						if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
-						{
-							//delay
-						}
-						else
-						{
-							//set rs
-							cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
-						}
-					}
-
-					//lock rt
-					cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
-
-					break;
-				case 0x04:
-				case 0x05:
-					//beq bne
-
-					break;
-				case 0x23:
-					//lw
-
-					//set rt
-					cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
-
-					//set need write back
-					cpu.SetIdExNeedWriteBack(1);
-
-					//set index
-					cpu.SetIdExIndex(cpu.GetDecoder().GetRt(cpu.GetIr()));
-
-					//can rs get from fw
-					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
-					{
-						cpu.SetIdExRs(cpu.GetFw0Value());
-					}
-					else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
-					{
-						cpu.SetIdExRs(cpu.GetFw1Value());
-					}
-					else
-					{
-						//is reg locked
-						if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
-						{
-							//delay
-						}
-						else
-						{
-							//set rs
-							cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
-						}
-					}
-
-					//lock rt
-					cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
-
-					break;
-				case 0x2B:
-					//sw
+					cpu.SetIdExIndex(cpu.GetDecoder().GetRd(cpu.GetIr()));
 
 					//can rt get from fw
 					if (cpu.GetFw0Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
@@ -656,14 +463,12 @@ int main() {
 						if (cpu.IsRegLocked(cpu.GetDecoder().GetRt(cpu.GetIr())))
 						{
 							//delay
+							throw 1;
 						}
 						else
 						{
 							//set rt
 							cpu.SetIdExRt(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
-
-							//set reg value
-							cpu.SetIdExRegValue(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
 						}
 					}
 
@@ -682,6 +487,7 @@ int main() {
 						if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
 						{
 							//delay
+							throw 1;
 						}
 						else
 						{
@@ -690,47 +496,277 @@ int main() {
 						}
 					}
 
+					//lock rd
+					cpu.LockReg(cpu.GetDecoder().GetRd(cpu.GetIr()));
+
+					//set need write back
+					cpu.SetIdExNeedWriteBack(1);
+
+					break;
+				case 2:
+					//type J
+					cpu.SetIdExTypeJ(1);
+
+					//set op
+					cpu.SetIdExOp(0x02);
+
+					//set address_
+					cpu.SetIdExAddress_(cpu.GetDecoder().GetAddress(cpu.GetIr()));
+
 					break;
 				default:
+					//case I
+					cpu.SetIdExTypeI(1);
+
+					//set op
+					switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
+					{
+					case 0x0C:
+						//andi
+						cpu.SetIdExOp(0x0C);
+						break;
+					case 0x0D:
+						//ori
+						cpu.SetIdExOp(0x0D);
+						break;
+					case 0x0E:
+						//xori
+						cpu.SetIdExOp(0x0E);
+						break;
+					case 0x04:
+						//beq
+						cpu.SetIdExOp(0x04);
+						break;
+					case 0x05:
+						//bne
+						cpu.SetIdExOp(0x05);
+						break;
+					case 0x23:
+						//lw
+						cpu.SetIdExOp(0x23);
+						cpu.SetIdExNeedLoad(1);
+						break;
+					case 0x2B:
+						//sw
+						cpu.SetIdExOp(0x2B);
+						cpu.SetIdExNeedStore(1);
+						break;
+					default:
+						//not support
+						cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
+						IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
+						exit(0);
+						break;
+					}
+
+					//set immediate
+					cpu.SetIdExImmediate(cpu.GetDecoder().GetImmediate(cpu.GetIr()));
+
+					//rs rt related
+					switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
+					{
+					case 0x0C:
+					case 0x0D:
+					case 0x0E:
+						//andi ori xori
+
+						//set rt
+						cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+						//set need write back
+						cpu.SetIdExNeedWriteBack(1);
+
+						//set index
+						cpu.SetIdExIndex(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+						//can rs get from fw
+						if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cpu.SetIdExRs(cpu.GetFw0Value());
+						}
+						else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cpu.SetIdExRs(cpu.GetFw1Value());
+						}
+						else
+						{
+							//is reg locked
+							if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+							{
+								//delay
+								throw 1;
+							}
+							else
+							{
+								//set rs
+								cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+							}
+						}
+
+						//lock rt
+						cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+						break;
+					case 0x04:
+					case 0x05:
+						//beq bne
+
+						break;
+					case 0x23:
+						//lw
+
+						//set rt
+						cpu.SetIdExRt(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+						//set need write back
+						cpu.SetIdExNeedWriteBack(1);
+
+						//set index
+						cpu.SetIdExIndex(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+						//can rs get from fw
+						if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cpu.SetIdExRs(cpu.GetFw0Value());
+						}
+						else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cpu.SetIdExRs(cpu.GetFw1Value());
+						}
+						else
+						{
+							//is reg locked
+							if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+							{
+								//delay
+								throw 1;
+							}
+							else
+							{
+								//set rs
+								cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+							}
+						}
+
+						//lock rt
+						cpu.LockReg(cpu.GetDecoder().GetRt(cpu.GetIr()));
+
+						break;
+					case 0x2B:
+						//sw
+
+						//can rt get from fw
+						if (cpu.GetFw0Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+						{
+							cpu.SetIdExRt(cpu.GetFw0Value());
+						}
+						else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+						{
+							cpu.SetIdExRt(cpu.GetFw1Value());
+						}
+						else
+						{
+							//is reg locked
+							if (cpu.IsRegLocked(cpu.GetDecoder().GetRt(cpu.GetIr())))
+							{
+								//delay
+								throw 1;
+							}
+							else
+							{
+								//set rt
+								cpu.SetIdExRt(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
+
+								//set reg value
+								cpu.SetIdExRegValue(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRt(cpu.GetIr())));
+							}
+						}
+
+						//can rs get from fw
+						if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cpu.SetIdExRs(cpu.GetFw0Value());
+						}
+						else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cpu.SetIdExRs(cpu.GetFw1Value());
+						}
+						else
+						{
+							//is reg locked
+							if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+							{
+								//delay
+								throw 1;
+							}
+							else
+							{
+								//set rs
+								cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+							}
+						}
+
+						break;
+					default:
+						break;
+					}
+
 					break;
 				}
+			}
 
+			//IF
+			cout << "IF" << endl;
+			IOHelper::WriteLog("IF");
+			if (!cpu.IsReady(0))
+			{
+				cout << "No work now." << endl;
+				IOHelper::WriteLog("No work now.");
+			}
+			else
+			{
+				if (cpu.GetMemIfAllow() == 1)
+				{
+					//delay
+					throw 0;
+				}
+				else
+				{
+					//fetch instruction from memory to IR
+					cpu.SetIr(memory.ReadWord(cpu.GetPc()));
+
+					//modify pc
+					cpu.SetPc(cpu.GetPc() + 4);
+				}
+			}
+
+		}
+		catch (int index)
+		{
+			//delay process
+			switch (index)
+			{
+			case 4:
+				cpu.SetRunInterrupted(4);
+			case 3:
+				cpu.SetRunInterrupted(3);
+			case 2:
+				cpu.SetRunInterrupted(2);
+			case 1:
+				cpu.SetRunInterrupted(1);
+			case 0:
+				cpu.SetRunInterrupted(0);
+				break;
+			default:
 				break;
 			}
 		}
 
-		//IF
-		cout << "IF" << endl;
-		IOHelper::WriteLog("IF");
-		if (!cpu.IsReady(0))
-		{
-			cout << "No work now." << endl;
-			IOHelper::WriteLog("No work now.");
-		}
-		else
-		{
-			if (cpu.GetMemIfAllow() == 1)
-			{
-				//delay
-			}
-			else
-			{
-				//fetch instruction from memory to IR
-				cpu.SetIr(memory.ReadWord(cpu.GetPc()));
+		//Set next clock time ready
+		cpu.SetNewReady();
 
-				//modify pc
-				cpu.SetPc(cpu.GetPc() + 4);
-			}
-		}
-
-		if (!readyStateChangedFlag)
-		{
-			cpu.MoveOnReady();
-		}
-
-
-		cout << "========== Clock " << clockNumber << " run end. ==========" << endl;
-		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " run end. ==========");
+		cout << "========== Clock " << clockNumber << " run end. ==========\n" << endl;
+		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " run end. ==========\n");
 		if (!enableSingleStepTest)
 		{
 
@@ -738,8 +774,8 @@ int main() {
 		else
 		{
 			//test time
-			cout << "\nNow start clock " << clockNumber << " test..." << endl;
-			IOHelper::WriteLog("\nClock " + to_string(clockNumber) + " test");
+			cout << "Now start clock " << clockNumber << " test..." << endl;
+			IOHelper::WriteLog("Clock " + to_string(clockNumber) + " test");
 			int mode = -1;
 			while (mode != 0)
 			{

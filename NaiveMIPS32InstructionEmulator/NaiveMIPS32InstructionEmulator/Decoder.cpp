@@ -1,5 +1,14 @@
 #include "NaiveMIPS32InstructionEmulator.h"
 
+Decoder::Decoder()
+{
+	cout << "[Decoder] Initialize Decoder..." << endl;
+	IOHelper::WriteLog("[Decoder] Initialize Decoder...");
+
+	cout << "[Decoder] Decoder initialized." << endl;
+	IOHelper::WriteLog("[Decoder] Decoder initialized.");
+}
+
 word Decoder::GetOp(instruction i)
 {
 	return getSubNumInUnsignedInt(i, 31, 6);

@@ -2,14 +2,22 @@
 
 Cpu::Cpu()
 {
-	isReady[0] = true;
-	for (int i = 1; i < 5; i++)
-	{
-		isReady[i] = false;
-	}
+	cout << "[Cpu] Initialize Cpu..." << endl;
+	IOHelper::WriteLog("[Cpu] Initialize Cpu...");
 
-	fw0_index.Set(999);
-	fw1_index.Set(999);
+	//initialize ready status
+	for (int i = 4; i > 0; i--)
+	{
+		SetNotReady(i);
+	}
+	SetReady(0);
+	
+	//initialize fw
+	SetFw0Vacant();
+	SetFw1Vacant();
+
+	cout << "[Cpu] Cpu initialized." << endl;
+	IOHelper::WriteLog("[Cpu] Cpu initialized.");
 }
 
 GeneralPurposeRegisterSet & Cpu::GetGeneralPurposeRegisterSet()
@@ -46,12 +54,14 @@ void Cpu::LockReg(int index)
 	if (index >= 0 && index < 32)
 	{
 		//set 1
+		cout << "[Cpu] Lock register r" << index << "." << endl;
+		IOHelper::WriteLog("[Cpu] Lock register r" + to_string(index) + ".");
 		lockMarker.Set(lockMarker.Get() | (1 << index));
 	}
 	else
 	{
-		cout << "Warning! Invalid index " << index << " detected! No register locked in this call." << endl;
-		IOHelper::WriteLog("Warning! Invalid index " + to_string(index) + " detected! No register locked in this call.");
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! No register locked in this call." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! No register locked in this call.");
 	}
 }
 
@@ -60,12 +70,14 @@ void Cpu::UnlockReg(int index)
 	if (index >= 0 && index < 32)
 	{
 		//set 0
+		cout << "[Cpu] Unlock register r" << index << "." << endl;
+		IOHelper::WriteLog("[Cpu] Unlock register r" + to_string(index) + ".");
 		lockMarker.Set(lockMarker.Get() & (~(1 << index)));
 	}
 	else
 	{
-		cout << "Warning! Invalid index " << index << " detected! No register unlocked in this call." << endl;
-		IOHelper::WriteLog("Warning! Invalid index " + to_string(index) + " detected! No register unlocked in this call.");
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! No register unlocked in this call." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! No register unlocked in this call.");
 	}
 }
 
@@ -78,10 +90,22 @@ bool Cpu::IsRegLocked(int index)
 	}
 	else
 	{
-		cout << "Warning! Invalid index " << index << " detected! Return false by default." << endl;
-		IOHelper::WriteLog("Warning! Invalid index " + to_string(index) + " detected! Return false by default.");
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! Return false by default." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! Return false by default.");
 		return false;
 	}
+}
+
+bool Cpu::IsFw0Vacant()
+{
+	return fw0_index.Get() == 999;
+}
+
+void Cpu::SetFw0Vacant()
+{
+	cout << "[Cpu] Set register Fw0 vacant." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw0 vacant.");
+	fw0_index.Set(999);
 }
 
 void Cpu::SetFw0Value(word w)
@@ -106,6 +130,18 @@ void Cpu::SetFw0Index(word w)
 word Cpu::GetFw0Index()
 {
 	return fw0_index.Get();
+}
+
+bool Cpu::IsFw1Vacant()
+{
+	return fw1_index.Get() == 999;
+}
+
+void Cpu::SetFw1Vacant()
+{
+	cout << "[Cpu] Set register Fw1 vacant." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw1 vacant.");
+	fw1_index.Set(999);
 }
 
 void Cpu::SetFw1Value(word w)
@@ -302,37 +338,135 @@ bool Cpu::IsReady(int index)
 {
 	if (index >= 0 && index < 5)
 	{
-		return isReady[index];
+		return (isReady.Get() & (1 << index)) >> index;
 	}
 	else
 	{
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! Return true by default." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! Return true by default.");
 		return true;
 	}
 }
 
-void Cpu::MoveOnReady()
-{
-	for (int i = 4; i > 0; i--)
-	{
-		isReady[i] = isReady[i - 1];
-	}
-}
-
-void Cpu::DropReady(int index)
+void Cpu::SetReady(int index)
 {
 	if (index >= 0 && index < 5)
 	{
-		for (int i = index; i > 0; i--)
-		{
-			isReady[i] = false;
-		}
-		isReady[0] = true;
-		for (int i = 4; i > index; i--)
-		{
-			isReady[i] = isReady[i - 1];
-		}
+		//set 1
+		cout << "[Cpu] Set process " << index << " ready." << endl;
+		IOHelper::WriteLog("[Cpu] Set process " + to_string(index) + " ready.");
+		isReady.Set(isReady.Get() | (1 << index));
+	}
+	else
+	{
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! No process set ready in this call." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! No process set ready in this call.");
 	}
 }
+
+void Cpu::SetNotReady(int index)
+{
+	if (index >= 0 && index < 5)
+	{
+		//set 0
+		cout << "[Cpu] Set process " << index << " not ready." << endl;
+		IOHelper::WriteLog("[Cpu] Set process " + to_string(index) + " not ready.");
+		isReady.Set(isReady.Get() & (~(1 << index)));
+	}
+	else
+	{
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! No process set not ready in this call." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! No process set not ready in this call.");
+	}
+}
+
+void Cpu::SetNewReady()
+{
+	for (int i = 4; i > 0; i--)
+	{
+		if (IsRunDone(i - 1))
+		{
+			SetReady(i);
+		}
+		else
+		{
+			SetNotReady(i);
+		}
+	}
+	SetReady(0);
+}
+
+bool Cpu::IsRunDone(int index)
+{
+	if (index >= 0 && index < 5)
+	{
+		return (runStatus.Get() & (1 << index)) >> index;
+	}
+	else
+	{
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! Return true by default." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! Return true by default.");
+		return true;
+	}
+}
+
+void Cpu::SetRunDone(int index)
+{
+	if (index >= 0 && index < 5)
+	{
+		//set 1
+		cout << "[Cpu] Set process " << index << " done." << endl;
+		IOHelper::WriteLog("[Cpu] Set process " + to_string(index) + " done.");
+		runStatus.Set(runStatus.Get() | (1 << index));
+	}
+	else
+	{
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! No process set done in this call." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! No process set done in this call.");
+	}
+}
+
+void Cpu::SetRunInterrupted(int index)
+{
+	if (index >= 0 && index < 5)
+	{
+		//set 0
+		cout << "[Cpu] Set process " << index << " interrupted." << endl;
+		IOHelper::WriteLog("[Cpu] Set process " + to_string(index) + " interrupted.");
+		runStatus.Set(runStatus.Get() & (~(1 << index)));
+	}
+	else
+	{
+		cout << "[Cpu] Warning! Invalid index " << index << " detected! No process set interrupted in this call." << endl;
+		IOHelper::WriteLog("[Cpu] Warning! Invalid index " + to_string(index) + " detected! No process set interrupted in this call.");
+	}
+}
+
+void Cpu::ResetRunStatus()
+{
+	cout << "[Cpu] Reset all processes done." << endl;
+	IOHelper::WriteLog("[Cpu] Reset all processes done.");
+	for (int i = 0; i < 5; i++)
+	{
+		SetRunDone(i);
+	}
+}
+
+//void Cpu::DropReady(int index)
+//{
+//	if (index >= 0 && index < 5)
+//	{
+//		for (int i = index; i > 0; i--)
+//		{
+//			isReady[i] = false;
+//		}
+//		isReady[0] = true;
+//		for (int i = 4; i > index; i--)
+//		{
+//			isReady[i] = isReady[i - 1];
+//		}
+//	}
+//}
 
 void Cpu::SetIdExNeedLoad(word w)
 {
