@@ -152,8 +152,8 @@ int main() {
 			else
 			{
 				//write back
-				cout << "Write word " << ConvertHelper::WordToString(cpu.GetMemWbWord()) << " back to r" << cpu.GetMemWbIndex() << "." << endl;
-				IOHelper::WriteLog("Write word " + ConvertHelper::WordToString(cpu.GetMemWbWord()) + " back to r" + to_string(cpu.GetMemWbIndex()) + ".");
+				cout << "Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << " back to r" << cpu.GetMemWbIndex() << "." << endl;
+				IOHelper::WriteLog("Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + " back to r" + to_string(cpu.GetMemWbIndex()) + ".");
 				cpu.GetGeneralPurposeRegisterSet().Set(cpu.GetMemWbIndex(), cpu.GetMemWbWord());
 
 				//unlock reg
@@ -233,12 +233,12 @@ int main() {
 				if (cpu.GetFw0Index() == 999)
 				{
 					cpu.SetFw0Index(cpu.GetIdExIndex());
-					cpu.SetFw0Value(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
+					cpu.SetFw0Value(cpu.GetExMemWord());
 				}
 				else if (cpu.GetFw1Index() == 999)
 				{
 					cpu.SetFw1Index(cpu.GetIdExIndex());
-					cpu.SetFw1Value(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
+					cpu.SetFw1Value(cpu.GetExMemWord());
 				}
 				else
 				{
@@ -708,8 +708,8 @@ int main() {
 
 	}
 
-	cout << "By.bunnyxt 2018-9-17" << endl;
-	IOHelper::WriteLog("By.bunnyxt 2018-9-17\n");
+	cout << "By.bunnyxt 2018-9-20" << endl;
+	IOHelper::WriteLog("By.bunnyxt 2018-9-20\n");
 
 	IOHelper::WriteLog("Close log file.");
 	IOHelper::CloseLogFileStream();

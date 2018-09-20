@@ -96,8 +96,8 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 		//if (count == 32)
 		//{
 		m.WriteWord(add, w);
-		cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in address " << add << "." << endl;
-		WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + " loaded in address " + to_string(add) + ".");
+		cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in address " << add << "." << endl;
+		WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") loaded in address " + to_string(add) + ".");
 		//}
 		//else
 		//{
@@ -157,14 +157,14 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 			gprs.Set(index, w);
 			if (index != 0)
 			{
-				cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " loaded in register " << index << "." << endl;
-				WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + " loaded in register " + to_string(index) + ".");
+				cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in register " << index << "." << endl;
+				WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") loaded in register " + to_string(index) + ".");
 			}
 		}
 		else
 		{
-			cout << "Warning! Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << " in invalid register " << index << "." << endl;
-			WriteLog("Warning! Cannot load data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + " in invalid register " + to_string(index) + ".");
+			cout << "Warning! Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") in invalid register " << index << "." << endl;
+			WriteLog("Warning! Cannot load data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") in invalid register " + to_string(index) + ".");
 		}
 		//}
 		//else

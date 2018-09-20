@@ -29,8 +29,8 @@ void GeneralPurposeRegisterSet::Set(int index, word w)
 	}
 	else
 	{
-		cout << "[GeneralPurposeRegisterSet] Set register r" << index << " with value " << ConvertHelper::WordToString(w) << "(" << w << ")." << endl;
-		IOHelper::WriteLog("[GeneralPurposeRegisterSet] Set register r" + to_string(index) + " with value " + ConvertHelper::WordToString(w) + "(" + to_string(w) + ").");
+		cout << "[GeneralPurposeRegisterSet] Set register r" << index << " with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
+		IOHelper::WriteLog("[GeneralPurposeRegisterSet] Set register r" + to_string(index) + " with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 		gpr[index].Set(w);
 	}
 }
