@@ -19,8 +19,8 @@ GeneralPurposeRegisterSet & Cpu::GetGeneralPurposeRegisterSet()
 
 void Cpu::SetPc(address add)
 {
-	cout << "[Cpu] Set register PC with value " << ConvertHelper::AddressToString(add) << "(" << add << ")." << endl;
-	IOHelper::WriteLog("[Cpu] Set register PC with value " + ConvertHelper::AddressToString(add) + "(" + to_string(add) + ").");
+	cout << "[Cpu] Set register PC with value " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) << "(" << add << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register PC with value " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) + "(" + to_string(add) + ").");
 	pc.Set(add);
 }
 
@@ -31,8 +31,8 @@ address Cpu::GetPc()
 
 void Cpu::SetIr(instruction i)
 {
-	cout << "[Cpu] Set register IR with value " << ConvertHelper::InstructionToString(i) << "(" << i << ")." << endl;
-	IOHelper::WriteLog("[Cpu] Set register IR with value " + ConvertHelper::InstructionToString(i) + "(" + to_string(i) + ").");
+	cout << "[Cpu] Set register IR with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "(" << i << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IR with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + "(" + to_string(i) + ").");
 	ir.Set(i);
 }
 
@@ -86,6 +86,8 @@ bool Cpu::IsRegLocked(int index)
 
 void Cpu::SetFw0Value(word w)
 {
+	cout << "[Cpu] Set register Fw0Value with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw0Value with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	fw0_value.Set(w);
 }
 
@@ -96,6 +98,8 @@ word Cpu::GetFw0Value()
 
 void Cpu::SetFw0Index(word w)
 {
+	cout << "[Cpu] Set register Fw0Index with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw0Index with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	fw0_index.Set(w);
 }
 
@@ -106,6 +110,8 @@ word Cpu::GetFw0Index()
 
 void Cpu::SetFw1Value(word w)
 {
+	cout << "[Cpu] Set register Fw1Value with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw1Value with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	fw1_value.Set(w);
 }
 
@@ -116,6 +122,8 @@ word Cpu::GetFw1Value()
 
 void Cpu::SetFw1Index(word w)
 {
+	cout << "[Cpu] Set register Fw1Index with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw1Index with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	fw1_index.Set(w);
 }
 
@@ -136,6 +144,8 @@ Alu Cpu::GetAlu()
 
 void Cpu::SetIdExTypeR(word w)
 {
+	cout << "[Cpu] Set register IdExTypeR with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExTypeR with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_type_R.Set(w);
 }
 
@@ -146,6 +156,8 @@ word Cpu::GetIdExTypeR()
 
 void Cpu::SetIdExTypeI(word w)
 {
+	cout << "[Cpu] Set register IdExTypeI with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExTypeI with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_type_I.Set(w);
 }
 
@@ -156,6 +168,8 @@ word Cpu::GetIdExTypeI()
 
 void Cpu::SetIdExTypeJ(word w)
 {
+	cout << "[Cpu] Set register IdExTypeJ with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExTypeJ with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_type_J.Set(w);
 }
 
@@ -166,6 +180,8 @@ word Cpu::GetIdExTypeJ()
 
 void Cpu::SetIdExOp(word w)
 {
+	cout << "[Cpu] Set register IdExOp with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExOp with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_op.Set(w);
 }
 
@@ -176,6 +192,8 @@ word Cpu::GetIdExOp()
 
 void Cpu::SetIdExRs(word w)
 {
+	cout << "[Cpu] Set register IdExRs with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExRs with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_rs.Set(w);
 }
 
@@ -186,6 +204,8 @@ word Cpu::GetIdExRs()
 
 void Cpu::SetIdExRt(word w)
 {
+	cout << "[Cpu] Set register IdExRt with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExRt with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_rt.Set(w);
 }
 
@@ -196,6 +216,8 @@ word Cpu::GetIdExRt()
 
 void Cpu::SetIdExRd(word w)
 {
+	cout << "[Cpu] Set register IdExRd with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExRd with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_rd.Set(w);
 }
 
@@ -206,6 +228,8 @@ word Cpu::GetIdExRd()
 
 void Cpu::SetIdExShamt(word w)
 {
+	cout << "[Cpu] Set register IdExShamt with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExShamt with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_shamt.Set(w);
 }
 
@@ -216,6 +240,8 @@ word Cpu::GetIdExShamt()
 
 void Cpu::SetIdExFunc(word w)
 {
+	cout << "[Cpu] Set register IdExFunc with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExFunc with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_func.Set(w);
 }
 
@@ -226,6 +252,8 @@ word Cpu::GetIdExFunc()
 
 void Cpu::SetIdExImmediate(word w)
 {
+	cout << "[Cpu] Set register IdExImmediate with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExImmediate with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_immediate.Set(w);
 }
 
@@ -236,6 +264,8 @@ word Cpu::GetIdExImmediate()
 
 void Cpu::SetIdExAddress_(address add)
 {
+	cout << "[Cpu] Set register IdExAddress_ with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(add)) << "(" << add << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExAddress_ with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(add)) + "(" + to_string(add) + ").");
 	id_ex_address_.Set(add);
 }
 
@@ -282,6 +312,8 @@ void Cpu::DropReady(int index)
 
 void Cpu::SetIdExNeedLoad(word w)
 {
+	cout << "[Cpu] Set register IdExNeedLoad with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExNeedLoad with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_need_load.Set(w);
 }
 
@@ -292,6 +324,8 @@ word Cpu::GetIdExNeedLoad()
 
 void Cpu::SetIdExNeedStore(word w)
 {
+	cout << "[Cpu] Set register IdExNeedStore with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExNeedStore with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_need_store.Set(w);
 }
 
@@ -312,6 +346,8 @@ word Cpu::GetIdExNeedStore()
 
 void Cpu::SetIdExRegValue(word w)
 {
+	cout << "[Cpu] Set register IdExRegValue with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExRegValue with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_reg_value.Set(w);
 }
 
@@ -322,6 +358,8 @@ word Cpu::GetIdExRegValue()
 
 void Cpu::SetIdExNeedWriteBack(word w)
 {
+	cout << "[Cpu] Set register IdExNeedWriteBack with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExNeedWriteBack with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_need_write_back.Set(w);
 }
 
@@ -332,6 +370,8 @@ word Cpu::GetIdExNeedWriteBack()
 
 void Cpu::SetIdExIndex(word w)
 {
+	cout << "[Cpu] Set register IdExIndex with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register IdExIndex with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	id_ex_index.Set(w);
 }
 
@@ -352,6 +392,8 @@ word Cpu::GetIdExIndex()
 
 void Cpu::SetExMemNeedLoad(word w)
 {
+	cout << "[Cpu] Set register ExMemNeedLoad with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemNeedLoad with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_need_load.Set(w);
 }
 
@@ -362,6 +404,8 @@ word Cpu::GetExMemNeedLoad()
 
 void Cpu::SetExMemNeedStore(word w)
 {
+	cout << "[Cpu] Set register ExMemNeedStore with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemNeedStore with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_need_store.Set(w);
 }
 
@@ -372,6 +416,8 @@ word Cpu::GetExMemNeedStore()
 
 void Cpu::SetExMemAddress(address add)
 {
+	cout << "[Cpu] Set register ExMemNeedAddress with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(add)) << "(" << add << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemNeedAddress with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(add)) + "(" + to_string(add) + ").");
 	ex_mem_address.Set(add);
 }
 
@@ -382,6 +428,8 @@ address Cpu::GetExMemAddress()
 
 void Cpu::SetExMemRegValue(word w)
 {
+	cout << "[Cpu] Set register ExMemRegValue with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemRegValue with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_reg_value.Set(w);
 }
 
@@ -392,6 +440,8 @@ word Cpu::GetExMemRegValue()
 
 void Cpu::SetExMemNeedWriteBack(word w)
 {
+	cout << "[Cpu] Set register ExMemNeedWriteBack with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemNeedWriteBack with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_need_write_back.Set(w);
 }
 
@@ -402,6 +452,8 @@ word Cpu::GetExMemNeedWriteBack()
 
 void Cpu::SetExMemIndex(word w)
 {
+	cout << "[Cpu] Set register ExMemNeedIndex with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemNeedIndex with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_index.Set(w);
 }
 
@@ -412,6 +464,8 @@ word Cpu::GetExMemIndex()
 
 void Cpu::SetExMemWord(word w)
 {
+	cout << "[Cpu] Set register ExMemNeedWord with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register ExMemNeedWord with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_word.Set(w);
 }
 
@@ -422,6 +476,8 @@ word Cpu::GetExMemWord()
 
 void Cpu::SetMemIfAllow(word w)
 {
+	cout << "[Cpu] Set register MemIfAllow with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register MemIfAllow with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	mem_if_allow.Set(w);
 }
 
@@ -432,6 +488,8 @@ word Cpu::GetMemIfAllow()
 
 void Cpu::SetMemWbNeedWriteBack(word w)
 {
+	cout << "[Cpu] Set register MemWbNeedWriteBack with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register MemWbNeedWriteBack with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	mem_wb_need_write_back.Set(w);
 }
 
@@ -442,6 +500,8 @@ word Cpu::GetMemWbNeedWriteBack()
 
 void Cpu::SetMemWbIndex(word w)
 {
+	cout << "[Cpu] Set register MemWbIndex with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register MemWbIndex with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	mem_wb_index.Set(w);
 }
 
@@ -452,6 +512,8 @@ word Cpu::GetMemWbIndex()
 
 void Cpu::SetMemWbWord(word w)
 {
+	cout << "[Cpu] Set register MemWbWord with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register MemWbWord with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(w)) + "(" + to_string(w) + ").");
 	mem_wb_word.Set(w);
 }
 
