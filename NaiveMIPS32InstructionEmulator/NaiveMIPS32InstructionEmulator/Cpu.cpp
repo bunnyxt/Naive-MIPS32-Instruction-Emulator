@@ -11,7 +11,7 @@ Cpu::Cpu()
 		SetNotReady(i);
 	}
 	SetReady(0);
-	
+
 	//initialize fw
 	SetFw0Vacant();
 	SetFw1Vacant();
@@ -460,7 +460,7 @@ void Cpu::ResetRunStatus()
 {
 	cout << "[Cpu] Reset all processes done." << endl;
 	IOHelper::WriteLog("[Cpu] Reset all processes done.");
-	for (int i = 0; i < 5; i++)
+	for (int i = 4; i >= 0; i--)
 	{
 		SetRunDone(i);
 	}
