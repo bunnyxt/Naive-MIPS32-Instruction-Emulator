@@ -4,29 +4,29 @@
 ofstream IOHelper::log = ofstream();
 
 int main() {
-	cout << "Naive MIPS32 Instruction Emulator" << endl;
+	cout << "[Emulator] Naive MIPS32 Instruction Emulator by.bunnyxt" << endl;
 	cout << endl;
 
 	//open log filestream
 	if (IOHelper::OpenLogFileStream())
 	{
-		cout << "Log file created successfully!\n" << endl;
-		IOHelper::WriteLog("Naive MIPS32 Instruction Emulator\n");
-		IOHelper::WriteLog("Log file created.\n");
+		cout << "[Emulator] Log file created successfully!\n" << endl;
+		IOHelper::WriteLog("[Emulator] Naive MIPS32 Instruction Emulator\n");
+		IOHelper::WriteLog("[Emulator] Log file created.\n");
 	}
 	else
 	{
-		cout << "Error! Fail to create log file. Now exit..." << endl;
+		cout << "[Emulator] Error! Fail to create log file. Now exit..." << endl;
 		exit(0);
 	}
 
 	//initialize components
-	cout << "Now initialize components..." << endl;
-	IOHelper::WriteLog("Now initialize components...");
+	cout << "[Emulator] Now initialize components..." << endl;
+	IOHelper::WriteLog("[Emulator] Now initialize components...");
 	Cpu cpu;
 	Memory memory;
-	cout << "Components initialized.\n" << endl;
-	IOHelper::WriteLog("Components initialized.\n");
+	cout << "[Emulator] Components initialized.\n" << endl;
+	IOHelper::WriteLog("[Emulator] Components initialized.\n");
 
 	//load code & data
 	string codeFileName, memoryDataFileName, registerDataFileName;
@@ -35,70 +35,70 @@ int main() {
 	//load code
 	while (true)
 	{
-		IOHelper::WriteLog("Now load code file...");
-		cout << "Enter code file name : ";
+		IOHelper::WriteLog("[Emulator] Now load code file...");
+		cout << "[Emulator] Enter code file name : ";
 		cin >> codeFileName;
 		codeFileIn.open(codeFileName);
 		if (!codeFileIn.is_open())
 		{
-			cout << "Warning! Cannot open code file " << codeFileName << "! Please retry..." << endl;
-			IOHelper::WriteLog("Fail to open file " + codeFileName + ".");
+			cout << "[Emulator] Warning! Cannot open code file " << codeFileName << "! Please retry..." << endl;
+			IOHelper::WriteLog("[Emulator] Warning! Fail to open file " + codeFileName + ".");
 		}
 		else
 		{
-			cout << "Code file " << codeFileName << " opened successfully!" << endl;
-			IOHelper::WriteLog("Load code from " + codeFileName + "...");
+			cout << "[Emulator] Code file " << codeFileName << " opened successfully!" << endl;
+			IOHelper::WriteLog("[Emulator] Load code from " + codeFileName + "...");
 			break;
 		}
 	}
 	IOHelper::LoadCode(memory, codeFileIn);
-	IOHelper::WriteLog("Code file loaded.\n");
+	IOHelper::WriteLog("[Emulator] Code file loaded.\n");
 	cout << endl;
 
 	//load memory data
 	while (true)
 	{
-		IOHelper::WriteLog("Now load memory data file...");
-		cout << "Enter memory data file name : ";
+		IOHelper::WriteLog("[Emulator] Now load memory data file...");
+		cout << "[Emulator] Enter memory data file name : ";
 		cin >> memoryDataFileName;
 		memoryDataFileIn.open(memoryDataFileName);
 		if (!memoryDataFileIn.is_open())
 		{
-			cout << "Warning! Cannot open memory data file " << memoryDataFileName << "! Please retry..." << endl;
-			IOHelper::WriteLog("Fail to open file " + memoryDataFileName + ".");
+			cout << "[Emulator] Warning! Cannot open memory data file " << memoryDataFileName << "! Please retry..." << endl;
+			IOHelper::WriteLog("[Emulator] Warning! Fail to open file " + memoryDataFileName + ".");
 		}
 		else
 		{
-			cout << "Memory data file " << memoryDataFileName << " opened successfully!" << endl;
-			IOHelper::WriteLog("Load memory data from " + memoryDataFileName + "...");
+			cout << "[Emulator] Memory data file " << memoryDataFileName << " opened successfully!" << endl;
+			IOHelper::WriteLog("[Emulator] Load memory data from " + memoryDataFileName + "...");
 			break;
 		}
 	}
 	IOHelper::LoadMemoryData(memory, memoryDataFileIn);
-	IOHelper::WriteLog("Memory data file loaded.\n");
+	IOHelper::WriteLog("[Emulator] Memory data file loaded.\n");
 	cout << endl;
 
 	//load register data
 	while (true)
 	{
-		IOHelper::WriteLog("Now load register data file...");
-		cout << "Enter register data file name : ";
+		IOHelper::WriteLog("[Emulator] Now load register data file...");
+		cout << "[Emulator] Enter register data file name : ";
 		cin >> registerDataFileName;
 		registerDataFileIn.open(registerDataFileName);
 		if (!registerDataFileIn.is_open())
 		{
-			cout << "Warning! Cannot open register data file " << registerDataFileName << "! Please retry..." << endl;
-			IOHelper::WriteLog("Fail to open file " + registerDataFileName + ".");
+			cout << "[Emulator] Warning! Cannot open register data file " << registerDataFileName << "! Please retry..." << endl;
+			IOHelper::WriteLog("[Emulator] Warning! Fail to open file " + registerDataFileName + ".");
 		}
 		else
 		{
-			cout << "Register data file " << registerDataFileName << " opened successfully!" << endl;
-			IOHelper::WriteLog("Load register data from " + registerDataFileName + "...");
+			cout << "[Emulator] Register data file " << registerDataFileName << " opened successfully!" << endl;
+			IOHelper::WriteLog("[Emulator] Load register data from " + registerDataFileName + "...");
 			break;
 		}
 	}
 	IOHelper::LoadRegisterData(cpu.GetGeneralPurposeRegisterSet(), registerDataFileIn);
-	IOHelper::WriteLog("Register data file loaded.\n");
+	IOHelper::WriteLog("[Emulator] Register data file loaded.\n");
 	cout << endl;
 
 	//select mode
@@ -106,25 +106,25 @@ int main() {
 	while (true)
 	{
 		char ch;
-		cout << "Enable single step debugging? Y/N : ";
+		cout << "[Emulator] Enable single step debugging? Y/N : ";
 		cin >> ch;
 		if (ch == 'Y' || ch == 'y')
 		{
 			enableSingleStepTest = true;
-			cout << "Enable single step test." << endl;
-			IOHelper::WriteLog("Enable single step test.\n");
+			cout << "[Emulator] Enable single step test." << endl;
+			IOHelper::WriteLog("[Emulator] Enable single step test.\n");
 			break;
 		}
 		else if (ch == 'N' || ch == 'n')
 		{
 			enableSingleStepTest = false;
-			cout << "Disable single step test." << endl;
-			IOHelper::WriteLog("Disable single step test.\n");
+			cout << "[Emulator] Disable single step test." << endl;
+			IOHelper::WriteLog("[Emulator] Disable single step test.\n");
 			break;
 		}
 		else
 		{
-			cout << "Warning! Invalid mode detected! Please retry..." << endl;
+			cout << "[Emulator] Warning! Invalid mode detected! Please retry..." << endl;
 		}
 	}
 	cout << endl;
@@ -134,34 +134,34 @@ int main() {
 	bool eoiDetected = false;
 	while (cpu.HasWork())
 	{
-		cout << "==================== Now start clock " << clockNumber << "... ====================" << endl;
-		IOHelper::WriteLog("==================== Clock " + to_string(clockNumber) + " ====================");
+		cout << "[Emulator] ==================== Now start clock " << clockNumber << "... ====================" << endl;
+		IOHelper::WriteLog("[Emulator] ==================== Clock " + to_string(clockNumber) + " ====================");
 
 		cpu.ResetRunStatus();
 
 		try
 		{
 			//WB
-			cout << clockNumber << " - WB" << endl;
-			IOHelper::WriteLog(to_string(clockNumber) + " - WB");
+			cout << "[Emulator] -------------------- " << clockNumber << " - WB begin --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - WB begin --------------------");
 			if (!cpu.IsReady(4))
 			{
-				cout << "No work now." << endl;
-				IOHelper::WriteLog("No work now.");
+				cout << "[Emulator] No work now." << endl;
+				IOHelper::WriteLog("[Emulator] No work now.");
 				cpu.SetRunInterrupted(4);
 			}
 			else
 			{
 				if (cpu.GetMemWbNeedWriteBack() == 0)
 				{
-					cout << "No need now." << endl;
-					IOHelper::WriteLog("No need now.");
+					cout << "[Emulator] Not need to write back now." << endl;
+					IOHelper::WriteLog("[Emulator] Not need to write back now.");
 				}
 				else
 				{
 					//write back
-					cout << "Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << "(" << cpu.GetMemWbWord() << ") back to r" << cpu.GetMemWbIndex() << "." << endl;
-					IOHelper::WriteLog("Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + "(" + to_string(cpu.GetMemWbWord()) + ") back to r" + to_string(cpu.GetMemWbIndex()) + ".");
+					cout << "[Emulator] Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << "(" << cpu.GetMemWbWord() << ") back to r" << cpu.GetMemWbIndex() << "." << endl;
+					IOHelper::WriteLog("[Emulator] Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + "(" + to_string(cpu.GetMemWbWord()) + ") back to r" + to_string(cpu.GetMemWbIndex()) + ".");
 					cpu.GetGeneralPurposeRegisterSet().Set(cpu.GetMemWbIndex(), cpu.GetMemWbWord());
 
 					//unlock reg
@@ -182,14 +182,16 @@ int main() {
 					}
 				}
 			}
+			cout << "[Emulator] -------------------- " << clockNumber << " - WB end --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - WB end --------------------");
 
 			//MEM
-			cout << clockNumber << " - MEM" << endl;
-			IOHelper::WriteLog(to_string(clockNumber) + " - MEM");
+			cout << "[Emulator] -------------------- " << clockNumber << " - MEM begin --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - MEM begin --------------------");
 			if (!cpu.IsReady(3))
 			{
-				cout << "No work now." << endl;
-				IOHelper::WriteLog("No work now.");
+				cout << "[Emulator] No work now." << endl;
+				IOHelper::WriteLog("[Emulator] No work now.");
 				cpu.SetRunInterrupted(3);
 			}
 			else
@@ -240,14 +242,16 @@ int main() {
 				cpu.SetMemWbNeedWriteBack(cpu.GetExMemNeedWriteBack());
 				cpu.SetMemWbIndex(cpu.GetExMemIndex());
 			}
+			cout << "[Emulator] -------------------- " << clockNumber << " - MEM end --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - MEM end --------------------");
 
 			//EX
-			cout << clockNumber << " - EX" << endl;
-			IOHelper::WriteLog(to_string(clockNumber) + " - EX");
+			cout << "[Emulator] --------------------" << clockNumber << " - EX begin --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - EX begin --------------------");
 			if (!cpu.IsReady(2))
 			{
-				cout << "No work now." << endl;
-				IOHelper::WriteLog("No work now.");
+				cout << "[Emulator] No work now." << endl;
+				IOHelper::WriteLog("[Emulator] No work now.");
 				cpu.SetRunInterrupted(2);
 			}
 			else
@@ -335,8 +339,8 @@ int main() {
 				else
 				{
 					//not support
-					cout << "Error! No valid instruction type detected! Now exit..." << endl;
-					IOHelper::WriteLog("Error! No valid instruction type detected! Now exit...");
+					cout << "[Emulator] Error! No valid instruction type detected! Now exit..." << endl;
+					IOHelper::WriteLog("[Emulator] Error! No valid instruction type detected! Now exit...");
 					exit(0);
 				}
 
@@ -347,21 +351,23 @@ int main() {
 				cpu.SetExMemNeedWriteBack(cpu.GetIdExNeedWriteBack());
 				cpu.SetExMemIndex(cpu.GetIdExIndex());
 			}
+			cout << "[Emulator] -------------------- " << clockNumber << " - EX end --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - EX end --------------------");
 
 			//ID
-			cout << clockNumber << " - ID" << endl;
-			IOHelper::WriteLog(to_string(clockNumber) + " - ID");
+			cout << "[Emulator] -------------------- " << clockNumber << " - ID begin --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - ID begin -------------------- ");
 			if (!cpu.IsReady(1))
 			{
-				cout << "No work now." << endl;
-				IOHelper::WriteLog("No work now.");
+				cout << "[Emulator] No work now." << endl;
+				IOHelper::WriteLog("[Emulator] No work now.");
 				cpu.SetRunInterrupted(1);
 			}
 			else
 			{
 				//clear reg
-				cout << "Now clear regsiters..." << endl;
-				IOHelper::WriteLog("Now clear registers...");
+				cout << "[Emulator] Now clear regsiters..." << endl;
+				IOHelper::WriteLog("[Emulator] Now clear registers...");
 				cpu.SetIdExTypeR(0);
 				cpu.SetIdExTypeJ(0);
 				cpu.SetIdExTypeI(0);
@@ -375,13 +381,11 @@ int main() {
 				cpu.SetIdExAddress_(0);
 				cpu.SetIdExNeedLoad(0);
 				cpu.SetIdExNeedStore(0);
-				//cpu.SetIdExAddress(0);
 				cpu.SetIdExRegValue(0);
 				cpu.SetIdExNeedWriteBack(0);
 				cpu.SetIdExIndex(0);
-				//cpu.SetIdExWord(0);
-				cout << "Clear registers done." << endl;
-				IOHelper::WriteLog("Clear registers done.");
+				cout << "[Emulator] Clear registers done." << endl;
+				IOHelper::WriteLog("[Emulator] Clear registers done.");
 
 				//category instruction loaded in IR
 				switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
@@ -434,8 +438,8 @@ int main() {
 						break;
 					default:
 						//not support 
-						cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
-						IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
+						cout << "[Emulator] Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
+						IOHelper::WriteLog("[Emulator] Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
 						exit(0);
 						break;
 					}
@@ -554,15 +558,15 @@ int main() {
 						break;
 					case 0x3F:
 						//end of instructions (customized)
-						cout << "End of instructions (customized) detected!" << endl;
-						IOHelper::WriteLog("End of instructions (customized) detected!");
+						cout << "[Emulator] End of instructions (customized) detected!" << endl;
+						IOHelper::WriteLog("[Emulator] End of instructions (customized) detected!");
 						eoiDetected = true;
 						throw 1;
 						break;
 					default:
 						//not support
-						cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
-						IOHelper::WriteLog("Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
+						cout << "[Emulator] Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
+						IOHelper::WriteLog("[Emulator] Error! Invalid instruction " + ConvertHelper::InstructionToString(cpu.GetIr()) + " detected! Now exit...");
 						exit(0);
 						break;
 					}
@@ -722,14 +726,16 @@ int main() {
 					break;
 				}
 			}
+			cout << "[Emulator] -------------------- " << clockNumber << " - ID end --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - ID end --------------------");
 
 			//IF
-			cout << clockNumber << " - IF" << endl;
-			IOHelper::WriteLog(to_string(clockNumber) + " - IF");
+			cout << "[Emulator] -------------------- " << clockNumber << " - IF begin --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - IF begin --------------------");
 			if (!cpu.IsReady(0))
 			{
-				cout << "No work now." << endl;
-				IOHelper::WriteLog("No work now.");
+				cout << "[Emulator] No work now." << endl;
+				IOHelper::WriteLog("[Emulator] No work now.");
 				cpu.SetRunInterrupted(0);
 			}
 			else
@@ -748,6 +754,8 @@ int main() {
 					cpu.SetPc(cpu.GetPc() + 4);
 				}
 			}
+			cout << "[Emulator] -------------------- " << clockNumber << " - IF end --------------------" << endl;
+			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - IF end --------------------");
 
 		}
 		catch (int index)
@@ -780,8 +788,8 @@ int main() {
 			cpu.SetNotReady(0);
 		}
 
-		cout << "==================== Clock " << clockNumber << " run end. ====================\n" << endl;
-		IOHelper::WriteLog("==================== Clock " + to_string(clockNumber) + " run end. ====================\n");
+		cout << "[Emulator] ==================== Clock " << clockNumber << " run end. ====================\n" << endl;
+		IOHelper::WriteLog("[Emulator] ==================== Clock " + to_string(clockNumber) + " run end. ====================\n");
 		if (!enableSingleStepTest)
 		{
 
@@ -789,40 +797,40 @@ int main() {
 		else
 		{
 			//test time
-			cout << "Now start clock " << clockNumber << " test..." << endl;
-			IOHelper::WriteLog("Clock " + to_string(clockNumber) + " test");
+			cout << "[Emulator] Now start clock " << clockNumber << " test..." << endl;
+			IOHelper::WriteLog("[Emulator] Clock " + to_string(clockNumber) + " test");
 			int mode = -1;
 			while (mode != 0)
 			{
-				cout << "Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - continue to next clock ;\nSelect mode : ";
+				cout << "[Emulator] Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - continue to next clock ;\nSelect mode : ";
 				cin >> mode;
 				switch (mode)
 				{
 				case 1:
-					cout << "Now view general purpose register set in cpu..." << endl;
-					IOHelper::WriteLog("Now view general purpose register set in cpu...");
+					cout << "[Emulator] Now view general purpose register set in cpu..." << endl;
+					IOHelper::WriteLog("[Emulator] Now view general purpose register set in cpu...");
 					TestHelper::ViewGeneralPurposeRegisterSet(cpu);
 					break;
 				case 2:
-					cout << "Now view view other registers in cpu..." << endl;
-					IOHelper::WriteLog("Now view view other registers in cpu...");
+					cout << "[Emulator] Now view view other registers in cpu..." << endl;
+					IOHelper::WriteLog("[Emulator] Now view view other registers in cpu...");
 					TestHelper::ViewOtherRegisters(cpu);
 					break;
 				case 3:
-					cout << "Now view memory unit value..." << endl;
+					cout << "[Emulator] Now view memory unit value..." << endl;
 					address a;
-					cout << "Please enter memory address(dec format) : ";
+					cout << "[Emulator] Please enter memory address(dec format) : ";
 					cin >> a;
-					cout << "Now view memoru unit value near address " << a << "..." << endl;
-					IOHelper::WriteLog("Now view memoru unit value near address " + to_string(a) + "...");
+					cout << "[Emulator] Now view memoru unit value near address " << a << "..." << endl;
+					IOHelper::WriteLog("[Emulator] Now view memoru unit value near address " + to_string(a) + "...");
 					TestHelper::ViewMemoryUnitValue(memory, a);
 					break;
 				case 0:
-					cout << "Now continue to next clock...\n" << endl;
-					IOHelper::WriteLog("Now continue to next clock...\n");
+					cout << "[Emulator] Now continue to next clock...\n" << endl;
+					IOHelper::WriteLog("[Emulator] Now continue to next clock...\n");
 					break;
 				default:
-					cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
+					cout << "[Emulator] Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
 					break;
 				}
 			}
@@ -835,45 +843,45 @@ int main() {
 	while (true)
 	{
 		char ch;
-		cout << "No more instructions left now! Need test now? Y/N : ";
+		cout << "[Emulator] No more instructions left now! Need test now? Y/N : ";
 		cin >> ch;
 		if (ch == 'Y' || ch == 'y')
 		{
-			cout << "Now start last test." << endl;
-			IOHelper::WriteLog("Now start last test.");
+			cout << "[Emulator] Now start last test." << endl;
+			IOHelper::WriteLog("[Emulator] Now start last test.");
 
 			int mode = -1;
 			while (mode != 0)
 			{
-				cout << "Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - exit last test ;\nSelect mode : ";
+				cout << "[Emulator] Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - exit last test ;\nSelect mode : ";
 				cin >> mode;
 				switch (mode)
 				{
 				case 1:
-					cout << "Now view general purpose register set in cpu..." << endl;
-					IOHelper::WriteLog("Now view general purpose register set in cpu...");
+					cout << "[Emulator] Now view general purpose register set in cpu..." << endl;
+					IOHelper::WriteLog("[Emulator] Now view general purpose register set in cpu...");
 					TestHelper::ViewGeneralPurposeRegisterSet(cpu);
 					break;
 				case 2:
-					cout << "Now view view other registers in cpu..." << endl;
-					IOHelper::WriteLog("Now view view other registers in cpu...");
+					cout << "[Emulator] Now view view other registers in cpu..." << endl;
+					IOHelper::WriteLog("[Emulator] Now view view other registers in cpu...");
 					TestHelper::ViewOtherRegisters(cpu);
 					break;
 				case 3:
-					cout << "Now view memory unit value..." << endl;
+					cout << "[Emulator] Now view memory unit value..." << endl;
 					address a;
-					cout << "Please enter memory address(dec format) : ";
+					cout << "[Emulator] Please enter memory address(dec format) : ";
 					cin >> a;
-					cout << "Now view memoru unit value near address " << a << "..." << endl;
-					IOHelper::WriteLog("Now view memoru unit value near address " + to_string(a) + "...");
+					cout << "[Emulator] Now view memoru unit value near address " << a << "..." << endl;
+					IOHelper::WriteLog("[Emulator] Now view memoru unit value near address " + to_string(a) + "...");
 					TestHelper::ViewMemoryUnitValue(memory, a);
 					break;
 				case 0:
-					cout << "Now exit last test...\n" << endl;
-					IOHelper::WriteLog("Now exit last test...\n");
+					cout << "[Emulator] Now exit last test...\n" << endl;
+					IOHelper::WriteLog("[Emulator] Now exit last test...\n");
 					break;
 				default:
-					cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
+					cout << "[Emulator] Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
 					break;
 				}
 			}
@@ -881,20 +889,20 @@ int main() {
 		}
 		else if (ch == 'N' || ch == 'n')
 		{
-			cout << "Last test skipped.\n" << endl;
-			IOHelper::WriteLog("Last test skipped.\n");
+			cout << "[Emulator] Last test skipped.\n" << endl;
+			IOHelper::WriteLog("[Emulator] Last test skipped.\n");
 			break;
 		}
 		else
 		{
-			cout << "Warning! Invalid input detected! Please retry..." << endl;
+			cout << "[Emulator] Warning! Invalid input detected! Please retry..." << endl;
 		}
 	}
 
-	cout << "By.bunnyxt 2018-9-20" << endl;
-	IOHelper::WriteLog("By.bunnyxt 2018-9-20\n");
+	cout << "[Emulator] By.bunnyxt 2018-9-20" << endl;
+	IOHelper::WriteLog("[Emulator] By.bunnyxt 2018-9-20\n");
 
-	IOHelper::WriteLog("Close log file.");
+	IOHelper::WriteLog("[Emulator] Close log file.");
 	IOHelper::CloseLogFileStream();
 
 	return 0;

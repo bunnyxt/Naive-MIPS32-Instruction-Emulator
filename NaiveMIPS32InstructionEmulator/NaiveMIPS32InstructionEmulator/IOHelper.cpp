@@ -6,7 +6,7 @@ void IOHelper::LoadCode(Memory &m, ifstream &in)
 	string s;
 	instruction i;
 
-	cout << "Now loading codes..." << endl;
+	cout << "[IOHelper] Now loading codes..." << endl;
 
 	while (getline(in, s))
 	{
@@ -37,18 +37,18 @@ void IOHelper::LoadCode(Memory &m, ifstream &in)
 		if (count == 32)
 		{
 			m.WriteWord(add, i);
-			cout << "Instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << " loaded in address " << add << "." << endl;
-			WriteLog("Instruction " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + " loaded in address " + to_string(add) + ".");
+			cout << "[IOHelper] Instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << " loaded in address " << add << "." << endl;
+			WriteLog("[IOHelper] Instruction " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + " loaded in address " + to_string(add) + ".");
 			add += 4;
 		}
 		else
 		{
-			cout << "Warning! Cannot load invalid instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "." << endl;
-			WriteLog("Warning! Cannot load invalid instruction " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + ".");
+			cout << "[IOHelper] Warning! Cannot load invalid instruction " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "." << endl;
+			WriteLog("[IOHelper] Warning! Cannot load invalid instruction " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + ".");
 		}
 	}
 
-	cout << "Code loaded successfully!" << endl;
+	cout << "[IOHelper] Code loaded successfully!" << endl;
 }
 
 void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
@@ -57,7 +57,7 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 	string s;
 	word w;
 
-	cout << "Now loading memory data..." << endl;
+	cout << "[IOHelper] Now loading memory data..." << endl;
 
 	while (getline(in, s))
 	{
@@ -96,8 +96,8 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 		//if (count == 32)
 		//{
 		m.WriteWord(add, w);
-		cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in address " << add << "." << endl;
-		WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") loaded in address " + to_string(add) + ".");
+		cout << "[IOHelper] Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in address " << add << "." << endl;
+		WriteLog("[IOHelper] Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") loaded in address " + to_string(add) + ".");
 		//}
 		//else
 		//{
@@ -105,7 +105,7 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 		//}
 	}
 
-	cout << "Memory data loaded successfully!" << endl;
+	cout << "[IOHelper] Memory data loaded successfully!" << endl;
 }
 
 void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
@@ -114,7 +114,7 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 	string s;
 	word w;
 
-	cout << "Now loading register data..." << endl;
+	cout << "[IOHelper] Now loading register data..." << endl;
 
 	while (getline(in, s))
 	{
@@ -157,14 +157,14 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 			gprs.Set(index, w);
 			if (index != 0)
 			{
-				cout << "Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in register " << index << "." << endl;
-				WriteLog("Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") loaded in register " + to_string(index) + ".");
+				cout << "[IOHelper] Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in register " << index << "." << endl;
+				WriteLog("[IOHelper] Data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") loaded in register " + to_string(index) + ".");
 			}
 		}
 		else
 		{
-			cout << "Warning! Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") in invalid register " << index << "." << endl;
-			WriteLog("Warning! Cannot load data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") in invalid register " + to_string(index) + ".");
+			cout << "[IOHelper] Warning! Cannot load data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") in invalid register " << index << "." << endl;
+			WriteLog("[IOHelper] Warning! Cannot load data " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ") in invalid register " + to_string(index) + ".");
 		}
 		//}
 		//else
@@ -173,7 +173,7 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 		//}
 	}
 
-	cout << "Register data loaded successfully!" << endl;
+	cout << "[IOHelper] Register data loaded successfully!" << endl;
 }
 
 bool IOHelper::OpenLogFileStream()
