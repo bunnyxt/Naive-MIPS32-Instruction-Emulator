@@ -396,6 +396,20 @@ void Cpu::SetNewReady()
 	SetReady(0);
 }
 
+bool Cpu::HasWork()
+{
+	bool result = false;
+	for (int i = 0; i < 5; i++)
+	{
+		if (IsReady(i))
+		{
+			result = true;
+			break;
+		}
+	}
+	return result;
+}
+
 bool Cpu::IsRunDone(int index)
 {
 	if (index >= 0 && index < 5)

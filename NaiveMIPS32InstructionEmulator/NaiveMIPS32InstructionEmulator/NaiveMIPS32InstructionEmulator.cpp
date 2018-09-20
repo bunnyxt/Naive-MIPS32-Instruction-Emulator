@@ -131,18 +131,19 @@ int main() {
 
 	//start process
 	int clockNumber = 1;
-	while (true)
+	bool eoiDetected = false;
+	while (cpu.HasWork())
 	{
-		cout << "========== Now start clock " << clockNumber << "... ==========" << endl;
-		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " ==========");
+		cout << "==================== Now start clock " << clockNumber << "... ====================" << endl;
+		IOHelper::WriteLog("==================== Clock " + to_string(clockNumber) + " ====================");
 
 		cpu.ResetRunStatus();
 
 		try
 		{
 			//WB
-			cout << "WB" << endl;
-			IOHelper::WriteLog("WB");
+			cout << clockNumber << " - WB" << endl;
+			IOHelper::WriteLog(to_string(clockNumber) + " - WB");
 			if (!cpu.IsReady(4))
 			{
 				cout << "No work now." << endl;
@@ -183,8 +184,8 @@ int main() {
 			}
 
 			//MEM
-			cout << "MEM" << endl;
-			IOHelper::WriteLog("MEM");
+			cout << clockNumber << " - MEM" << endl;
+			IOHelper::WriteLog(to_string(clockNumber) + " - MEM");
 			if (!cpu.IsReady(3))
 			{
 				cout << "No work now." << endl;
@@ -241,8 +242,8 @@ int main() {
 			}
 
 			//EX
-			cout << "EX" << endl;
-			IOHelper::WriteLog("EX");
+			cout << clockNumber << " - EX" << endl;
+			IOHelper::WriteLog(to_string(clockNumber) + " - EX");
 			if (!cpu.IsReady(2))
 			{
 				cout << "No work now." << endl;
@@ -348,8 +349,8 @@ int main() {
 			}
 
 			//ID
-			cout << "ID" << endl;
-			IOHelper::WriteLog("ID");
+			cout << clockNumber << " - ID" << endl;
+			IOHelper::WriteLog(to_string(clockNumber) + " - ID");
 			if (!cpu.IsReady(1))
 			{
 				cout << "No work now." << endl;
@@ -551,6 +552,13 @@ int main() {
 						cpu.SetIdExOp(0x2B);
 						cpu.SetIdExNeedStore(1);
 						break;
+					case 0x3F:
+						//end of instructions (customized)
+						cout << "End of instructions (customized) detected!" << endl;
+						IOHelper::WriteLog("End of instructions (customized) detected!");
+						eoiDetected = true;
+						throw 1;
+						break;
 					default:
 						//not support
 						cout << "Error! Invalid instruction " << ConvertHelper::InstructionToString(cpu.GetIr()) << " detected! Now exit..." << endl;
@@ -716,12 +724,13 @@ int main() {
 			}
 
 			//IF
-			cout << "IF" << endl;
-			IOHelper::WriteLog("IF");
+			cout << clockNumber << " - IF" << endl;
+			IOHelper::WriteLog(to_string(clockNumber) + " - IF");
 			if (!cpu.IsReady(0))
 			{
 				cout << "No work now." << endl;
 				IOHelper::WriteLog("No work now.");
+				cpu.SetRunInterrupted(0);
 			}
 			else
 			{
@@ -762,11 +771,17 @@ int main() {
 			}
 		}
 
-		//Set next clock time ready
+		//set next clock time ready
 		cpu.SetNewReady();
 
-		cout << "========== Clock " << clockNumber << " run end. ==========\n" << endl;
-		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " run end. ==========\n");
+		//end of instructions detected
+		if (eoiDetected)
+		{
+			cpu.SetNotReady(0);
+		}
+
+		cout << "==================== Clock " << clockNumber << " run end. ====================\n" << endl;
+		IOHelper::WriteLog("==================== Clock " + to_string(clockNumber) + " run end. ====================\n");
 		if (!enableSingleStepTest)
 		{
 
@@ -803,20 +818,77 @@ int main() {
 					TestHelper::ViewMemoryUnitValue(memory, a);
 					break;
 				case 0:
-					cout << "Now continue to next clock..." << endl;
-					IOHelper::WriteLog("Now continue to next clock...");
+					cout << "Now continue to next clock...\n" << endl;
+					IOHelper::WriteLog("Now continue to next clock...\n");
 					break;
 				default:
 					cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
 					break;
 				}
-				cout << endl;
-				IOHelper::WriteLog(" ");
 			}
 		}
 
 		clockNumber++;
 
+	}
+
+	while (true)
+	{
+		char ch;
+		cout << "No more instructions left now! Need test now? Y/N : ";
+		cin >> ch;
+		if (ch == 'Y' || ch == 'y')
+		{
+			cout << "Now start last test." << endl;
+			IOHelper::WriteLog("Now start last test.");
+
+			int mode = -1;
+			while (mode != 0)
+			{
+				cout << "Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - exit last test ;\nSelect mode : ";
+				cin >> mode;
+				switch (mode)
+				{
+				case 1:
+					cout << "Now view general purpose register set in cpu..." << endl;
+					IOHelper::WriteLog("Now view general purpose register set in cpu...");
+					TestHelper::ViewGeneralPurposeRegisterSet(cpu);
+					break;
+				case 2:
+					cout << "Now view view other registers in cpu..." << endl;
+					IOHelper::WriteLog("Now view view other registers in cpu...");
+					TestHelper::ViewOtherRegisters(cpu);
+					break;
+				case 3:
+					cout << "Now view memory unit value..." << endl;
+					address a;
+					cout << "Please enter memory address(dec format) : ";
+					cin >> a;
+					cout << "Now view memoru unit value near address " << a << "..." << endl;
+					IOHelper::WriteLog("Now view memoru unit value near address " + to_string(a) + "...");
+					TestHelper::ViewMemoryUnitValue(memory, a);
+					break;
+				case 0:
+					cout << "Now exit last test...\n" << endl;
+					IOHelper::WriteLog("Now exit last test...\n");
+					break;
+				default:
+					cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
+					break;
+				}
+			}
+			break;
+		}
+		else if (ch == 'N' || ch == 'n')
+		{
+			cout << "Last test skipped.\n" << endl;
+			IOHelper::WriteLog("Last test skipped.\n");
+			break;
+		}
+		else
+		{
+			cout << "Warning! Invalid input detected! Please retry..." << endl;
+		}
 	}
 
 	cout << "By.bunnyxt 2018-9-20" << endl;

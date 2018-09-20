@@ -58,8 +58,8 @@ void Memory::WriteWord(address add, word w)
 	add -= add % 4;
 
 	//write word
-	cout << "[Memory] Set value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << to_string(w) << ")" << " in address " << add << endl;
-	IOHelper::WriteLog("[Memory] Set value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ")" + " in address " + to_string(add));
+	cout << "[Memory] Set value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << to_string(w) << ")" << " in address " << add << "." << endl;
+	IOHelper::WriteLog("[Memory] Set value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ")" + " in address " + to_string(add) + ".");
 	for (int i = 0; i < 4; i++)
 	{
 		data[add + i] = (w & ((0x000000FF) << (i * 8))) >> (i * 8);
@@ -72,7 +72,7 @@ void Memory::WriteByte(address add, byte b)
 	add %= MEMSIZE;
 
 	//write byte
-	cout << "[Memory] Set value " << ConvertHelper::SeperateString(ConvertHelper::WordToString((word)b)) << "(" << to_string((word)b) << ")" << " in address " << add << endl;
-	IOHelper::WriteLog("[Memory] Set value " + ConvertHelper::SeperateString(ConvertHelper::WordToString((word)b)) + "(" + to_string((word)b) + ")" + " in address " + to_string(add));
+	cout << "[Memory] Set value " << ConvertHelper::SeperateString(ConvertHelper::WordToString((word)b)) << "(" << to_string((word)b) << ")" << " in address " << add << "." << endl;
+	IOHelper::WriteLog("[Memory] Set value " + ConvertHelper::SeperateString(ConvertHelper::WordToString((word)b)) + "(" + to_string((word)b) + ")" + " in address " + to_string(add) + ".");
 	data[add] = b;
 }
