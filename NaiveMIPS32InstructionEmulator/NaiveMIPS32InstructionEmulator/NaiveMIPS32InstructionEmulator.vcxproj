@@ -124,6 +124,7 @@
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="NaiveMIPS32InstructionEmulator.cpp" />
     <ClCompile Include="Register.cpp" />
+    <ClCompile Include="TestHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NaiveMIPS32InstructionEmulator.h" />

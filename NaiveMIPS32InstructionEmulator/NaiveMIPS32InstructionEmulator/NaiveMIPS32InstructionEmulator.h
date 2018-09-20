@@ -27,6 +27,7 @@ class GeneralPurposeRegisterSet;
 class Alu;
 class Decoder;
 class Cpu;
+class TestHelper;
 
 //IOHelper class
 class IOHelper {
@@ -255,4 +256,11 @@ private:
 	Register mem_wb_need_write_back;//need write back
 	Register mem_wb_index;//write back reg index
 	Register mem_wb_word;//write back word
+};
+
+class TestHelper {
+public:
+	void static ViewGeneralPurposeRegisterSet(Cpu cpu);
+	void static ViewOtherRegisters(Cpu cpu);
+	void static ViewMemoryUnitValue(Memory m, address a);
 };

@@ -164,7 +164,7 @@ int main() {
 				{
 					cpu.SetFw0Index(999);
 				}
-				else if(cpu.GetFw1Index() == cpu.GetMemWbIndex())
+				else if (cpu.GetFw1Index() == cpu.GetMemWbIndex())
 				{
 					cpu.SetFw1Index(999);
 				}
@@ -235,7 +235,7 @@ int main() {
 					cpu.SetFw0Index(cpu.GetIdExIndex());
 					cpu.SetFw0Value(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
 				}
-				else if(cpu.GetFw1Index() == 999)
+				else if (cpu.GetFw1Index() == 999)
 				{
 					cpu.SetFw1Index(cpu.GetIdExIndex());
 					cpu.SetFw1Value(cpu.GetAlu().CalculateR(cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExShamt(), cpu.GetIdExFunc()));
@@ -658,46 +658,55 @@ int main() {
 
 		cout << "Clock " << clockNumber << " run end." << endl;
 		IOHelper::WriteLog("Clock " + to_string(clockNumber) + " run end.");
-		clockNumber++;
 		if (!enableSingleStepTest)
 		{
-			cout << endl;
-			continue;
-		}
 
-		//test time
-		cout << "Now start clock " << clockNumber << " test..." << endl;
-		IOHelper::WriteLog("Clock " + to_string(clockNumber) + " test");
-		int mode = -1;
-		while (mode != 0)
+		}
+		else
 		{
-			cout << "Test mode selection : 1 - ; 2 - ; 3 - :";
-			cin >> mode;
-			switch (mode)
+			//test time
+			cout << "Now start clock " << clockNumber << " test..." << endl;
+			IOHelper::WriteLog("Clock " + to_string(clockNumber) + " test");
+			int mode = -1;
+			while (mode != 0)
 			{
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 0:
-				break;
-			default:
-				cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
-				break;
+				cout << "Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - continue to next clock ;\nSelect mode : ";
+				cin >> mode;
+				switch (mode)
+				{
+				case 1:
+					cout << "Now view general purpose register set in cpu..." << endl;
+					IOHelper::WriteLog("Now view general purpose register set in cpu...");
+					TestHelper::ViewGeneralPurposeRegisterSet(cpu);
+					break;
+				case 2:
+					cout << "Now view view other registers in cpu..." << endl;
+					IOHelper::WriteLog("Now view view other registers in cpu...");
+					TestHelper::ViewOtherRegisters(cpu);
+					break;
+				case 3:
+					cout << "Now view memory unit value..." << endl;
+					address a;
+					cout << "Please enter memory address(dec format) : ";
+					cin >> a;
+					cout << "Now view memoru unit value near address " << a << "..." << endl;
+					IOHelper::WriteLog("Now view memoru unit value near address " + to_string(a) + "...");
+					TestHelper::ViewMemoryUnitValue(memory, a);
+					break;
+				case 0:
+					cout << "Now continue to next clock..." << endl;
+					IOHelper::WriteLog("Now continue to next clock...");
+					break;
+				default:
+					cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
+					break;
+				}
 			}
 		}
+
+		clockNumber++;
+
 	}
-
-
-
-
-
-
-
-
-
 
 	cout << "By.bunnyxt 2018-9-17" << endl;
 	IOHelper::WriteLog("By.bunnyxt 2018-9-17\n");
