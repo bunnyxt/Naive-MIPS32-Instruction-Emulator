@@ -129,8 +129,8 @@ int main() {
 	int clockNumber = 1;
 	while (true)
 	{
-		cout << "Now start clock " << clockNumber << "..." << endl;
-		IOHelper::WriteLog("Clock " + to_string(clockNumber));
+		cout << "========== Now start clock " << clockNumber << "... ==========" << endl;
+		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " ==========");
 
 		bool readyStateChangedFlag = false;
 
@@ -152,8 +152,8 @@ int main() {
 			else
 			{
 				//write back
-				cout << "Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << " back to r" << cpu.GetMemWbIndex() << "." << endl;
-				IOHelper::WriteLog("Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + " back to r" + to_string(cpu.GetMemWbIndex()) + ".");
+				cout << "Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) << "(" << cpu.GetMemWbWord() << ") back to r" << cpu.GetMemWbIndex() << "." << endl;
+				IOHelper::WriteLog("Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetMemWbWord())) + "(" + to_string(cpu.GetMemWbWord()) + ") back to r" + to_string(cpu.GetMemWbIndex()) + ".");
 				cpu.GetGeneralPurposeRegisterSet().Set(cpu.GetMemWbIndex(), cpu.GetMemWbWord());
 
 				//unlock reg
@@ -192,6 +192,22 @@ int main() {
 
 				//not allow IF
 				cpu.SetMemIfAllow(1);
+
+				//set FW
+				if (cpu.GetFw0Index() == 999)
+				{
+					cpu.SetFw0Index(cpu.GetMemWbIndex());
+					cpu.SetFw0Value(cpu.GetMemWbWord());
+				}
+				else if (cpu.GetFw1Index() == 999)
+				{
+					cpu.SetFw1Index(cpu.GetMemWbIndex());
+					cpu.SetFw1Value(cpu.GetMemWbWord());
+				}
+				else
+				{
+					//no free fw now, fail to unlock before
+				}
 			}
 			else if (cpu.GetExMemNeedStore() != 0)
 			{
@@ -200,17 +216,20 @@ int main() {
 
 				//not allow IF
 				cpu.SetMemIfAllow(1);
+
+				cpu.SetMemWbWord(cpu.GetExMemWord());
 			}
 			else
 			{
 				//allow IF
 				cpu.SetMemIfAllow(0);
+
+				cpu.SetMemWbWord(cpu.GetExMemWord());
 			}
 
 			//TODO log
 			cpu.SetMemWbNeedWriteBack(cpu.GetExMemNeedWriteBack());
 			cpu.SetMemWbIndex(cpu.GetExMemIndex());
-			cpu.SetMemWbWord(cpu.GetExMemWord());
 		}
 
 		//EX
@@ -247,7 +266,57 @@ int main() {
 			}
 			else if (cpu.GetIdExTypeI() == 1)
 			{
+				switch (cpu.GetIdExOp())
+				{
+				case 0x0C:
+				case 0x0D:
+				case 0x0E:
+					//andi ori xori
 
+					//set word
+					cpu.SetExMemWord(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+
+					//set FW
+					if (cpu.GetFw0Index() == 999)
+					{
+						cpu.SetFw0Index(cpu.GetIdExIndex());
+						cpu.SetFw0Value(cpu.GetExMemWord());
+					}
+					else if (cpu.GetFw1Index() == 999)
+					{
+						cpu.SetFw1Index(cpu.GetIdExIndex());
+						cpu.SetFw1Value(cpu.GetExMemWord());
+					}
+					else
+					{
+						//no free fw now, fail to unlock before
+					}
+
+					break;
+				case 0x04:
+				case 0x05:
+					//beq bne
+
+					//TODO
+
+					break;
+				case 0x23:
+					//lw
+
+					//set address
+					cpu.SetExMemAddress(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+
+					break;
+				case 0x2B:
+					//sw
+
+					//set address
+					cpu.SetExMemAddress(cpu.GetAlu().CalculateI(cpu.GetIdExOp(), cpu.GetIdExRs(), cpu.GetIdExRt(), cpu.GetIdExImmediate()));
+
+					break;
+				default:
+					break;
+				}
 			}
 			else if (cpu.GetIdExTypeJ() == 1)
 			{
@@ -280,6 +349,8 @@ int main() {
 		else
 		{
 			//clear reg
+			cout << "Now clear regsiters..." << endl;
+			IOHelper::WriteLog("Now clear registers...");
 			cpu.SetIdExTypeR(0);
 			cpu.SetIdExTypeJ(0);
 			cpu.SetIdExTypeI(0);
@@ -298,6 +369,8 @@ int main() {
 			cpu.SetIdExNeedWriteBack(0);
 			cpu.SetIdExIndex(0);
 			//cpu.SetIdExWord(0);
+			cout << "Clear registers done." << endl;
+			IOHelper::WriteLog("Clear registers done.");
 
 			//category instruction loaded in IR
 			switch (cpu.GetDecoder().GetOp(cpu.GetIr()))
@@ -656,8 +729,8 @@ int main() {
 		}
 
 
-		cout << "Clock " << clockNumber << " run end." << endl;
-		IOHelper::WriteLog("Clock " + to_string(clockNumber) + " run end.");
+		cout << "========== Clock " << clockNumber << " run end. ==========" << endl;
+		IOHelper::WriteLog("========== Clock " + to_string(clockNumber) + " run end. ==========");
 		if (!enableSingleStepTest)
 		{
 
@@ -665,8 +738,8 @@ int main() {
 		else
 		{
 			//test time
-			cout << "Now start clock " << clockNumber << " test..." << endl;
-			IOHelper::WriteLog("Clock " + to_string(clockNumber) + " test");
+			cout << "\nNow start clock " << clockNumber << " test..." << endl;
+			IOHelper::WriteLog("\nClock " + to_string(clockNumber) + " test");
 			int mode = -1;
 			while (mode != 0)
 			{
@@ -701,6 +774,8 @@ int main() {
 					cout << "Warning! Invalid mode id " << mode << " detected! Please retry..." << endl;
 					break;
 				}
+				cout << endl;
+				IOHelper::WriteLog(" ");
 			}
 		}
 

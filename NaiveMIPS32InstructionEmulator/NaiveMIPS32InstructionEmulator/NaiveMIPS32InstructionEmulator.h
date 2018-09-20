@@ -148,6 +148,11 @@ public:
 	Decoder GetDecoder();
 	Alu GetAlu();
 
+	void SetIfIdPc(address add);
+	address GetIfIdPc();
+
+	void SetIdExPc(address add);
+	address GetIdExPc();
 	void SetIdExTypeR(word w);
 	word GetIdExTypeR();
 	void SetIdExTypeI(word w);
@@ -225,6 +230,9 @@ private:
 	Register pc;
 	Register ir;
 
+	Register if_id_pc;//pc of this instruction
+
+	Register id_ex_pc;//pc of this instruction
 	Register id_ex_type_R;//type R instruction
 	Register id_ex_type_I;//type I instruction
 	Register id_ex_type_J;//type J instruction
