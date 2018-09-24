@@ -176,6 +176,10 @@ int main() {
 					{
 						cpu.SetFw1Vacant();
 					}
+					else if (cpu.GetFw2Index() == cpu.GetMemWbIndex())
+					{
+						cpu.SetFw2Vacant();
+					}
 					else
 					{
 						//no index from found, something occurred
@@ -215,19 +219,24 @@ int main() {
 					IOHelper::WriteLog("[Emulator] Find a vacant fw and store the data in.");
 					if (cpu.IsFw0Vacant())
 					{
-						cpu.SetFw0Index(cpu.GetMemWbIndex());
+						cpu.SetFw0Index(cpu.GetExMemIndex());
 						cpu.SetFw0Value(cpu.GetMemWbWord());
 					}
 					else if (cpu.IsFw1Vacant())
 					{
-						cpu.SetFw1Index(cpu.GetMemWbIndex());
+						cpu.SetFw1Index(cpu.GetExMemIndex());
 						cpu.SetFw1Value(cpu.GetMemWbWord());
+					}
+					else if (cpu.IsFw2Vacant())
+					{
+						cpu.SetFw2Index(cpu.GetExMemIndex());
+						cpu.SetFw2Value(cpu.GetMemWbWord());
 					}
 					else
 					{
 						//no vacant fw now, something occurred
-						cout << "[Emulator] Warning! Not found fw which index is " << cpu.GetMemWbIndex() << " to set it vacant." << endl;
-						IOHelper::WriteLog("[Emulator] Warning! Not found fw which index is " + to_string(cpu.GetMemWbIndex()) + " to set it vacant.");
+						cout << "[Emulator] Warning! No vacant fw now." << endl;
+						IOHelper::WriteLog("[Emulator] Warning! Not vacant fw now.");
 					}
 				}
 				else if (cpu.GetExMemNeedStore() != 0)
@@ -300,11 +309,16 @@ int main() {
 						cpu.SetFw1Index(cpu.GetIdExIndex());
 						cpu.SetFw1Value(cpu.GetExMemWord());
 					}
+					else if (cpu.IsFw2Vacant())
+					{
+						cpu.SetFw2Index(cpu.GetIdExIndex());
+						cpu.SetFw2Value(cpu.GetExMemWord());
+					}
 					else
 					{
 						//no vacant fw now, something occurred
-						cout << "[Emulator] Warning! Not found fw which index is " << cpu.GetIdExIndex() << " to set it vacant." << endl;
-						IOHelper::WriteLog("[Emulator] Warning! Not found fw which index is " + to_string(cpu.GetIdExIndex()) + " to set it vacant.");
+						cout << "[Emulator] Warning! Not vacant fw now." << endl;
+						IOHelper::WriteLog("[Emulator] Warning! Not vacant fw now.");
 					}
 				}
 				else if (cpu.GetIdExTypeI() == 1)
@@ -335,11 +349,16 @@ int main() {
 							cpu.SetFw1Index(cpu.GetIdExIndex());
 							cpu.SetFw1Value(cpu.GetExMemWord());
 						}
+						else if (cpu.IsFw2Vacant())
+						{
+							cpu.SetFw2Index(cpu.GetIdExIndex());
+							cpu.SetFw2Value(cpu.GetExMemWord());
+						}
 						else
 						{
 							//no vacant fw now, something occurred
-							cout << "[Emulator] Warning! Not found fw which index is " << cpu.GetIdExIndex() << " to set it vacant." << endl;
-							IOHelper::WriteLog("[Emulator] Warning! Not found fw which index is " + to_string(cpu.GetIdExIndex()) + " to set it vacant.");
+							cout << "[Emulator] Warning! Not vacant fw now." << endl;
+							IOHelper::WriteLog("[Emulator] Warning! Not vacant fw now.");
 						}
 
 						break;
@@ -351,7 +370,7 @@ int main() {
 							cout << "[Emulator] Branch instruction beq detected and transition condition satisfied!" << endl;
 							IOHelper::WriteLog("[Emulator] Branch instruction beq detected and transition condition satisfied!");
 
-							cpu.SetPc(cpu.GetIdExPc() + ConvertHelper::GetSignExtendWord(cpu.GetIdExAddress_() << 2));
+							cpu.SetPc(cpu.GetIdExPc() + 4 + ConvertHelper::GetSignExtendWord(cpu.GetIdExImmediate() << 2));
 
 							//reset
 							cout << "[Emulator] Reset left process in this clock." << endl;
@@ -373,7 +392,7 @@ int main() {
 							cout << "[Emulator] Branch instruction bne detected and transition condition satisfied!" << endl;
 							IOHelper::WriteLog("[Emulator] Branch instruction bne detected and transition condition satisfied!");
 
-							cpu.SetPc(cpu.GetIdExPc() + ConvertHelper::GetSignExtendWord(cpu.GetIdExAddress_() << 2));
+							cpu.SetPc(cpu.GetIdExPc() + 4 + ConvertHelper::GetSignExtendWord(cpu.GetIdExImmediate() << 2));
 
 							//reset
 							cout << "[Emulator] Reset left process in this clock." << endl;
@@ -540,8 +559,53 @@ int main() {
 						cout << "[Emulator] Transition instruction jr detected!" << endl;
 						IOHelper::WriteLog("[Emulator] Transition instruction jr detected!");
 
+						cout << "[Emulator] Try get [rs] from fw." << endl;
+						IOHelper::WriteLog("[Emulator] Try get [rs] from fw.");
+						//can rs get from fw
+						if (cpu.GetFw0Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw0." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw0.");
+							cpu.SetIdExRs(cpu.GetFw0Value());
+						}
+						else if (cpu.GetFw1Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw1." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw1.");
+							cpu.SetIdExRs(cpu.GetFw1Value());
+						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw2.");
+							cpu.SetIdExRs(cpu.GetFw2Value());
+						}
+						else
+						{
+							cout << "[Emulator] Fail to get [rs] from fw." << endl;
+							IOHelper::WriteLog("[Emulator] Fail to get [rs] from fw.");
+
+							//is reg locked
+							if (cpu.IsRegLocked(cpu.GetDecoder().GetRs(cpu.GetIr())))
+							{
+								cout << "[Emulator] Register r" << cpu.GetDecoder().GetRs(cpu.GetIr()) << " locked! Now delay..." << endl;
+								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRs(cpu.GetIr())) + " locked! Now delay...");
+
+								//delay
+								throw 1 + 5;
+							}
+							else
+							{
+								cout << "[Emulator] Get [rs] from gprs." << endl;
+								IOHelper::WriteLog("[Emulator] Get [rs] from gprs.");
+
+								//set rs
+								cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+							}
+						}
+
 						//change pc
-						cpu.SetPc(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
+						cpu.SetPc(cpu.GetIdExRs());
 
 						//reset
 						cout << "[Emulator] Reset left process in this clock." << endl;
@@ -584,6 +648,12 @@ int main() {
 						IOHelper::WriteLog("[Emulator] Find [rt] from fw1.");
 						cpu.SetIdExRt(cpu.GetFw1Value());
 					}
+					else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+					{
+						cout << "[Emulator] Find [rt] from fw2." << endl;
+						IOHelper::WriteLog("[Emulator] Find [rt] from fw2.");
+						cpu.SetIdExRt(cpu.GetFw2Value());
+					}
 					else
 					{
 						cout << "[Emulator] Fail to get [rt] from fw." << endl;
@@ -596,7 +666,7 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRt(cpu.GetIr())) + " locked! Now delay...");
 
 							//delay
-							throw 1;
+							throw 1 + 5;
 						}
 						else
 						{
@@ -623,6 +693,12 @@ int main() {
 						IOHelper::WriteLog("[Emulator] Find [rs] from fw1.");
 						cpu.SetIdExRs(cpu.GetFw1Value());
 					}
+					else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+					{
+						cout << "[Emulator] Find [rs] from fw2." << endl;
+						IOHelper::WriteLog("[Emulator] Find [rs] from fw2.");
+						cpu.SetIdExRs(cpu.GetFw2Value());
+					}
 					else
 					{
 						cout << "[Emulator] Fail to get [rs] from fw." << endl;
@@ -635,7 +711,7 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRs(cpu.GetIr())) + " locked! Now delay...");
 
 							//delay
-							throw 1;
+							throw 1 + 5;
 						}
 						else
 						{
@@ -680,8 +756,8 @@ int main() {
 
 					break;
 				default:
-					cout << "[Emulator] Op is not 0x00 and 0x02, Type R instruction ensured." << endl;
-					IOHelper::WriteLog("[Emulator] Op is not 0x00 and 0x02, Type R instruction ensured.");
+					cout << "[Emulator] Op is not 0x00 and 0x02, Type I instruction ensured." << endl;
+					IOHelper::WriteLog("[Emulator] Op is not 0x00 and 0x02, Type I instruction ensured.");
 
 					//case I
 					cpu.SetIdExTypeI(1);
@@ -799,6 +875,12 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Find [rs] from fw1.");
 							cpu.SetIdExRs(cpu.GetFw1Value());
 						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw2.");
+							cpu.SetIdExRs(cpu.GetFw2Value());
+						}
 						else
 						{
 							cout << "[Emulator] Fail to get [rs] from fw." << endl;
@@ -811,7 +893,7 @@ int main() {
 								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRs(cpu.GetIr())) + " locked! Now delay...");
 
 								//delay
-								throw 1;
+								throw 1 + 5;
 							}
 							else
 							{
@@ -848,6 +930,12 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Find [rt] from fw1.");
 							cpu.SetIdExRt(cpu.GetFw1Value());
 						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rt] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rt] from fw2.");
+							cpu.SetIdExRt(cpu.GetFw2Value());
+						}
 						else
 						{
 							cout << "[Emulator] Fail to get [rt] from fw." << endl;
@@ -860,7 +948,7 @@ int main() {
 								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRt(cpu.GetIr())) + " locked! Now delay...");
 
 								//delay
-								throw 1;
+								throw 1 + 5;
 							}
 							else
 							{
@@ -887,6 +975,12 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Find [rs] from fw1.");
 							cpu.SetIdExRs(cpu.GetFw1Value());
 						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw2.");
+							cpu.SetIdExRs(cpu.GetFw2Value());
+						}
 						else
 						{
 							cout << "[Emulator] Fail to get [rs] from fw." << endl;
@@ -899,7 +993,7 @@ int main() {
 								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRs(cpu.GetIr())) + " locked! Now delay...");
 
 								//delay
-								throw 1;
+								throw 1 + 5;
 							}
 							else
 							{
@@ -910,6 +1004,7 @@ int main() {
 								cpu.SetIdExRs(cpu.GetGeneralPurposeRegisterSet().Get(cpu.GetDecoder().GetRs(cpu.GetIr())));
 							}
 						}
+
 						break;
 					case 0x23:
 						//lw
@@ -943,6 +1038,12 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Find [rs] from fw1.");
 							cpu.SetIdExRs(cpu.GetFw1Value());
 						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw2.");
+							cpu.SetIdExRs(cpu.GetFw2Value());
+						}
 						else
 						{
 							cout << "[Emulator] Fail to get [rs] from fw." << endl;
@@ -955,7 +1056,7 @@ int main() {
 								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRs(cpu.GetIr())) + " locked! Now delay...");
 
 								//delay
-								throw 1;
+								throw 1 + 5;
 							}
 							else
 							{
@@ -991,6 +1092,12 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Find [rt] from fw1.");
 							cpu.SetIdExRt(cpu.GetFw1Value());
 						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRt(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rt] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rt] from fw2.");
+							cpu.SetIdExRt(cpu.GetFw2Value());
+						}
 						else
 						{
 							cout << "[Emulator] Fail to get [rt] from fw." << endl;
@@ -1003,7 +1110,7 @@ int main() {
 								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRt(cpu.GetIr())) + " locked! Now delay...");
 
 								//delay
-								throw 1;
+								throw 1 + 5;
 							}
 							else
 							{
@@ -1036,6 +1143,12 @@ int main() {
 							IOHelper::WriteLog("[Emulator] Find [rs] from fw1.");
 							cpu.SetIdExRs(cpu.GetFw1Value());
 						}
+						else if (cpu.GetFw2Index() == cpu.GetDecoder().GetRs(cpu.GetIr()))
+						{
+							cout << "[Emulator] Find [rs] from fw2." << endl;
+							IOHelper::WriteLog("[Emulator] Find [rs] from fw2.");
+							cpu.SetIdExRs(cpu.GetFw2Value());
+						}
 						else
 						{
 							cout << "[Emulator] Fail to get [rs] from fw." << endl;
@@ -1048,7 +1161,7 @@ int main() {
 								IOHelper::WriteLog("[Emulator] Register r" + to_string(cpu.GetDecoder().GetRs(cpu.GetIr())) + " locked! Now delay...");
 
 								//delay
-								throw 1;
+								throw 1 + 5;
 							}
 							else
 							{
@@ -1065,6 +1178,13 @@ int main() {
 					}
 					break;
 				}
+
+				//trans regs
+				cout << "[Emulator] Now transfer data..." << endl;
+				IOHelper::WriteLog("[Emulator] Now transfer data...");
+				cpu.SetIdExPc(cpu.GetIfIdPc());
+				cout << "[Emulator] Data transferred done." << endl;
+				IOHelper::WriteLog("[Emulator] Data transferred done.");
 			}
 			cout << "[Emulator] -------------------- " << clockNumber << " - ID end --------------------" << endl;
 			IOHelper::WriteLog("[Emulator] -------------------- " + to_string(clockNumber) + " - ID end --------------------");
@@ -1085,8 +1205,13 @@ int main() {
 					cout << "[Emulator] Find that load/store done in this clock. Now delay..." << endl;
 					IOHelper::WriteLog("[Emulator] Find that load/store done in this clock. Now delay...");
 
+					//allow IF
+					cout << "[Emulator] Allow IF in next clock if possible." << endl;
+					IOHelper::WriteLog("[Emulator] Allow IF in next clock if possible.");
+					cpu.SetMemIfAllow(0);
+
 					//delay
-					throw 0;
+					throw 0 + 5;
 				}
 				else
 				{
@@ -1094,6 +1219,9 @@ int main() {
 					cout << "[Emulator] Fetch instruction from memory to IR." << endl;
 					IOHelper::WriteLog("[Emulator] Fetch instruction from memory to IR.");
 					cpu.SetIr(memory.ReadWord(cpu.GetPc()));
+
+					//set instruction pc
+					cpu.SetIfIdPc(cpu.GetPc());
 
 					//modify pc
 					cout << "[Emulator] PC + 1" << endl;
@@ -1110,8 +1238,8 @@ int main() {
 			cout << "[Emulator] Now set run status..." << endl;
 			IOHelper::WriteLog("[Emulator] Now set run status...");
 
-			//delay process
-			switch (index)
+			//reset process
+			switch (index % 5)
 			{
 			case 4:
 				cpu.SetRunInterrupted(4);
@@ -1123,6 +1251,27 @@ int main() {
 				cpu.SetRunInterrupted(1);
 			case 0:
 				cpu.SetRunInterrupted(0);
+				break;
+			default:
+				break;
+			}
+
+			//delay process
+			switch (index)
+			{
+			case 4 + 5:
+				cpu.SetRunDone(3);
+				break;
+			case 3 + 5:
+				cpu.SetRunDone(2);
+				break;
+			case 2 + 5:
+				cpu.SetRunDone(1);
+				break;
+			case 1 + 5:
+				cpu.SetRunDone(0);
+				break;
+			case 0 + 5:
 				break;
 			default:
 				break;
@@ -1156,7 +1305,7 @@ int main() {
 			int mode = -1;
 			while (mode != 0)
 			{
-				cout << "[Emulator] Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - continue to next clock ;\nSelect mode : ";
+				cout << "[Emulator] Test mode selection : \n[Emulator] 1 - view general purpose register set in cpu ; \n[Emulator] 2 - view other registers in cpu ; \n[Emulator] 3 - view memory unit value ; \n[Emulator] 0 - continue to next clock ;\n[Emulator] Select mode : ";
 				cin >> mode;
 				switch (mode)
 				{
@@ -1207,7 +1356,7 @@ int main() {
 			int mode = -1;
 			while (mode != 0)
 			{
-				cout << "[Emulator] Test mode selection : \n1 - view general purpose register set in cpu ; \n2 - view other registers in cpu ; \n3 - view memory unit value ; \n0 - exit last test ;\nSelect mode : ";
+				cout << "[Emulator] Test mode selection : \n[Emulator] 1 - view general purpose register set in cpu ; \n[Emulator] 2 - view other registers in cpu ; \n[Emulator] 3 - view memory unit value ; \n[Emulator] 0 - exit last test ;\n[Emulator] Select mode : ";
 				cin >> mode;
 				switch (mode)
 				{
@@ -1253,8 +1402,8 @@ int main() {
 		}
 	}
 
-	cout << "[Emulator] By.bunnyxt 2018-9-20" << endl;
-	IOHelper::WriteLog("[Emulator] By.bunnyxt 2018-9-20\n");
+	cout << "[Emulator] By.bunnyxt 2018-9-24" << endl;
+	IOHelper::WriteLog("[Emulator] By.bunnyxt 2018-9-24\n");
 
 	IOHelper::WriteLog("[Emulator] Close log file.");
 	IOHelper::CloseLogFileStream();

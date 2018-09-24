@@ -17,6 +17,11 @@ void TestHelper::ViewOtherRegisters(Cpu cpu)
 	cout << "IR : " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetIr())) << "(" << cpu.GetIr() << ")" << endl;
 	IOHelper::WriteLog("IR : " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetIr())) + "(" + to_string(cpu.GetIr()) + ")");
 
+	cout << "IfIdPc : " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(cpu.GetIfIdPc())) << "(" << cpu.GetIfIdPc() << ")" << endl;
+	IOHelper::WriteLog("IfIdPc : " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(cpu.GetIfIdPc())) + "(" + to_string(cpu.GetIfIdPc()) + ")");
+
+	cout << "IdExPc : " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(cpu.GetIdExPc())) << "(" << cpu.GetIdExPc() << ")" << endl;
+	IOHelper::WriteLog("IdExPc : " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(cpu.GetIdExPc())) + "(" + to_string(cpu.GetIdExPc()) + ")");
 	cout << "IdExTypeR : " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetIdExTypeR())) << "(" << cpu.GetIdExTypeR() << ")" << endl;
 	IOHelper::WriteLog("IdExTypeR : " + ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetIdExTypeR())) + "(" + to_string(cpu.GetIdExTypeR()) + ")");
 	cout << "IdExTypeI : " << ConvertHelper::SeperateString(ConvertHelper::WordToString(cpu.GetIdExTypeI())) << "(" << cpu.GetIdExTypeI() << ")" << endl;

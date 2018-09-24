@@ -15,6 +15,7 @@ Cpu::Cpu()
 	//initialize fw
 	SetFw0Vacant();
 	SetFw1Vacant();
+	SetFw2Vacant();
 
 	cout << "[Cpu] Cpu initialized." << endl;
 	IOHelper::WriteLog("[Cpu] Cpu initialized.");
@@ -166,6 +167,42 @@ void Cpu::SetFw1Index(word w)
 word Cpu::GetFw1Index()
 {
 	return fw1_index.Get();
+}
+
+bool Cpu::IsFw2Vacant()
+{
+	return fw2_index.Get() == 999;
+}
+
+void Cpu::SetFw2Vacant()
+{
+	cout << "[Cpu] Set register Fw2 vacant." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw2 vacant.");
+	fw2_index.Set(999);
+}
+
+void Cpu::SetFw2Value(word w)
+{
+	cout << "[Cpu] Set register Fw2Value with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw2Value with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
+	fw2_value.Set(w);
+}
+
+word Cpu::GetFw2Value()
+{
+	return fw2_value.Get();
+}
+
+void Cpu::SetFw2Index(word w)
+{
+	cout << "[Cpu] Set register Fw2Index with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
+	IOHelper::WriteLog("[Cpu] Set register Fw2Index with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
+	fw2_index.Set(w);
+}
+
+word Cpu::GetFw2Index()
+{
+	return fw2_index.Get();
 }
 
 Decoder Cpu::GetDecoder()
@@ -466,22 +503,6 @@ void Cpu::ResetRunStatus()
 	}
 }
 
-//void Cpu::DropReady(int index)
-//{
-//	if (index >= 0 && index < 5)
-//	{
-//		for (int i = index; i > 0; i--)
-//		{
-//			isReady[i] = false;
-//		}
-//		isReady[0] = true;
-//		for (int i = 4; i > index; i--)
-//		{
-//			isReady[i] = isReady[i - 1];
-//		}
-//	}
-//}
-
 void Cpu::SetIdExNeedLoad(word w)
 {
 	cout << "[Cpu] Set register IdExNeedLoad with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
@@ -505,16 +526,6 @@ word Cpu::GetIdExNeedStore()
 {
 	return id_ex_need_store.Get();
 }
-
-//void Cpu::SetIdExAddress(address add)
-//{
-//	id_ex_address.Set(add);
-//}
-//
-//address Cpu::GetIdExAddress()
-//{
-//	return id_ex_address.Get();
-//}
 
 void Cpu::SetIdExRegValue(word w)
 {
@@ -551,16 +562,6 @@ word Cpu::GetIdExIndex()
 {
 	return id_ex_index.Get();
 }
-
-//void Cpu::SetIdExWord(word w)
-//{
-//	id_ex_word.Set(w);
-//}
-//
-//word Cpu::GetIdExWord()
-//{
-//	return id_ex_word.Get();
-//}
 
 void Cpu::SetExMemNeedLoad(word w)
 {

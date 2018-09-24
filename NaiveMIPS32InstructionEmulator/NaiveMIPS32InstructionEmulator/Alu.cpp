@@ -64,7 +64,6 @@ word Alu::CalculateR(word rs, word rt, word shamt, word func)
 		break;
 	case 0x08:
 		//jr
-		//TODO
 		break;
 	default:
 		break;
@@ -97,11 +96,9 @@ word Alu::CalculateI(word op, word rs, word rt, word immediate)
 		break;
 	case 0x04:
 		//beq
-		//TODO
 		break;
 	case 0x05:
 		//bne
-		//TODO
 		break;
 	case 0x23:
 		//lw
@@ -123,6 +120,5 @@ word Alu::CalculateI(word op, word rs, word rt, word immediate)
 
 word Alu::CalculateJ(word op, word address)
 {
-	//TODO
 	return word();
 }

@@ -158,6 +158,12 @@ public:
 	word GetFw1Value();
 	void SetFw1Index(word w);
 	word GetFw1Index();
+	bool IsFw2Vacant();
+	void SetFw2Vacant();
+	void SetFw2Value(word w);
+	word GetFw2Value();
+	void SetFw2Index(word w);
+	word GetFw2Index();
 
 	Decoder GetDecoder();
 	Alu GetAlu();
@@ -193,16 +199,12 @@ public:
 	word GetIdExNeedLoad();
 	void SetIdExNeedStore(word w);
 	word GetIdExNeedStore();
-	//void SetIdExAddress(address add);
-	//address GetIdExAddress();
 	void SetIdExRegValue(word w);
 	word GetIdExRegValue();
 	void SetIdExNeedWriteBack(word w);
 	word GetIdExNeedWriteBack();
 	void SetIdExIndex(word w);
 	word GetIdExIndex();
-	//void SetIdExWord(word w);
-	//word GetIdExWord();
 
 	void SetExMemNeedLoad(word w);
 	word GetExMemNeedLoad();
@@ -237,6 +239,8 @@ private:
 	Register fw0_index;
 	Register fw1_value;
 	Register fw1_index;
+	Register fw2_value;
+	Register fw2_index;
 
 	Decoder decoder;
 	Alu alu;
@@ -261,11 +265,9 @@ private:
 	Register id_ex_address_;//address part
 	Register id_ex_need_load;//meed load
 	Register id_ex_need_store;//need store
-	//Register id_ex_address;//l/s memory address
 	Register id_ex_reg_value;//store to memory word reg value
 	Register id_ex_need_write_back;//need write back
 	Register id_ex_index;//write back reg index
-	//Register id_ex_word;//write back word
 
 	Register ex_mem_need_load;//need load
 	Register ex_mem_need_store;//nees store
