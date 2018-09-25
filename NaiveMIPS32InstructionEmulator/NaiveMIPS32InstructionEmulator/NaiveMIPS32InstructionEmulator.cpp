@@ -1261,16 +1261,12 @@ int main() {
 			{
 			case 4 + 5:
 				cpu.SetRunDone(3);
-				break;
 			case 3 + 5:
 				cpu.SetRunDone(2);
-				break;
 			case 2 + 5:
 				cpu.SetRunDone(1);
-				break;
 			case 1 + 5:
 				cpu.SetRunDone(0);
-				break;
 			case 0 + 5:
 				break;
 			default:

@@ -128,7 +128,6 @@ public:
 	void SetNotReady(int index);
 	void SetNewReady();
 	bool HasWork();
-	//void DropReady(int index);
 
 	bool IsRunDone(int index);
 	void SetRunDone(int index);
