@@ -34,7 +34,7 @@ class IOHelper {
 public:
 	static void LoadCode(Memory &m, ifstream &in);
 	static void LoadMemoryData(Memory &m, ifstream &in);
-	static void LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in);
+	static void LoadRegisterData(Cpu &cpu, ifstream &in);
 	static bool OpenLogFileStream();
 	static bool WriteLog(string s);
 	static bool CloseLogFileStream();
@@ -123,11 +123,69 @@ class Cpu {
 public:
 	Cpu();
 
+	void Run(Memory &memory, bool &eoiDetected, int clockNumber);
+	bool HasWork();
+
+	//allow IOHelper & TestHelper class access to private member
+	friend IOHelper;
+	friend TestHelper;
+
+private:
+	Register isReady;
+	Register runStatus;
+	Register lockMarker;
+
+	Register fw0_value;
+	Register fw0_index;
+	Register fw1_value;
+	Register fw1_index;
+	Register fw2_value;
+	Register fw2_index;
+
+	Decoder decoder;
+	Alu alu;
+
+	GeneralPurposeRegisterSet gprs;
+	Register pc;
+	Register ir;
+
+	Register if_id_pc;//pc of this instruction
+
+	Register id_ex_pc;//pc of this instruction
+	Register id_ex_type_R;//type R instruction
+	Register id_ex_type_I;//type I instruction
+	Register id_ex_type_J;//type J instruction
+	Register id_ex_op;//op part
+	Register id_ex_rs;//rs part
+	Register id_ex_rt;//rt part
+	Register id_ex_rd;//rd part
+	Register id_ex_shamt;//shamt part
+	Register id_ex_func;//func part
+	Register id_ex_immediate;//immediate part
+	Register id_ex_address_;//address part
+	Register id_ex_need_load;//meed load
+	Register id_ex_need_store;//need store
+	Register id_ex_reg_value;//store to memory word reg value
+	Register id_ex_need_write_back;//need write back
+	Register id_ex_index;//write back reg index
+
+	Register ex_mem_need_load;//need load
+	Register ex_mem_need_store;//nees store
+	Register ex_mem_address;//l/s memory address
+	Register ex_mem_reg_value;//store to memory word reg
+	Register ex_mem_need_write_back;//need write back
+	Register ex_mem_index;//write back index
+	Register ex_mem_word;//write back word
+
+	Register mem_if_allow;//allow if
+	Register mem_wb_need_write_back;//need write back
+	Register mem_wb_index;//write back reg index
+	Register mem_wb_word;//write back word
+
 	bool IsReady(int index);
 	void SetReady(int index);
 	void SetNotReady(int index);
 	void SetNewReady();
-	bool HasWork();
 
 	bool IsRunDone(int index);
 	void SetRunDone(int index);
@@ -228,58 +286,6 @@ public:
 	word GetMemWbIndex();
 	void SetMemWbWord(word w);
 	word GetMemWbWord();
-
-private:
-	Register isReady;
-	Register runStatus;
-	Register lockMarker;
-
-	Register fw0_value;
-	Register fw0_index;
-	Register fw1_value;
-	Register fw1_index;
-	Register fw2_value;
-	Register fw2_index;
-
-	Decoder decoder;
-	Alu alu;
-
-	GeneralPurposeRegisterSet gprs;
-	Register pc;
-	Register ir;
-
-	Register if_id_pc;//pc of this instruction
-
-	Register id_ex_pc;//pc of this instruction
-	Register id_ex_type_R;//type R instruction
-	Register id_ex_type_I;//type I instruction
-	Register id_ex_type_J;//type J instruction
-	Register id_ex_op;//op part
-	Register id_ex_rs;//rs part
-	Register id_ex_rt;//rt part
-	Register id_ex_rd;//rd part
-	Register id_ex_shamt;//shamt part
-	Register id_ex_func;//func part
-	Register id_ex_immediate;//immediate part
-	Register id_ex_address_;//address part
-	Register id_ex_need_load;//meed load
-	Register id_ex_need_store;//need store
-	Register id_ex_reg_value;//store to memory word reg value
-	Register id_ex_need_write_back;//need write back
-	Register id_ex_index;//write back reg index
-
-	Register ex_mem_need_load;//need load
-	Register ex_mem_need_store;//nees store
-	Register ex_mem_address;//l/s memory address
-	Register ex_mem_reg_value;//store to memory word reg
-	Register ex_mem_need_write_back;//need write back
-	Register ex_mem_index;//write back index
-	Register ex_mem_word;//write back word
-
-	Register mem_if_allow;//allow if
-	Register mem_wb_need_write_back;//need write back
-	Register mem_wb_index;//write back reg index
-	Register mem_wb_word;//write back word
 };
 
 class TestHelper {

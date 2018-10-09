@@ -108,7 +108,7 @@ void IOHelper::LoadMemoryData(Memory &m, ifstream &in)
 	cout << "[IOHelper] Memory data loaded successfully!" << endl;
 }
 
-void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
+void IOHelper::LoadRegisterData(Cpu &cpu, ifstream &in)
 {
 	int index;
 	string s;
@@ -150,11 +150,13 @@ void IOHelper::LoadRegisterData(GeneralPurposeRegisterSet &gprs, ifstream &in)
 			}
 		}
 
+		GeneralPurposeRegisterSet *gprs = &cpu.GetGeneralPurposeRegisterSet();
+
 		//if (count == 32)
 		//{
 		if (index >= 0 && index <= 31)
 		{
-			gprs.Set(index, w);
+			gprs->Set(index, w);
 			if (index != 0)
 			{
 				cout << "[IOHelper] Data " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ") loaded in register " << index << "." << endl;
