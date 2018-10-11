@@ -8,14 +8,14 @@ Cpu::Cpu()
 	//initialize ready status
 	for (int i = 4; i > 0; i--)
 	{
-		SetNotReady(i);
+		setNotReady(i);
 	}
-	SetReady(0);
+	setReady(0);
 
 	//initialize fw
-	SetFw0Vacant();
-	SetFw1Vacant();
-	SetFw2Vacant();
+	setFw0Vacant();
+	setFw1Vacant();
+	setFw2Vacant();
 
 	cout << "[Cpu] Cpu initialized." << endl;
 	IOHelper::WriteLog("[Cpu] Cpu initialized.");
@@ -24,22 +24,22 @@ Cpu::Cpu()
 void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 {
 
-	ResetRunStatus();
+	resetRunStatus();
 
 	try
 	{
 		//WB
 		cout << "[Cpu-Run] -------------------- " << clockNumber << " - WB begin --------------------" << endl;
 		IOHelper::WriteLog("[Cpu-Run] -------------------- " + to_string(clockNumber) + " - WB begin --------------------");
-		if (!IsReady(4))
+		if (!isReady(4))
 		{
 			cout << "[Cpu-Run] No work now." << endl;
 			IOHelper::WriteLog("[Cpu-Run] No work now.");
-			SetRunInterrupted(4);
+			setRunInterrupted(4);
 		}
 		else
 		{
-			if (GetMemWbNeedWriteBack() == 0)
+			if (getMemWbNeedWriteBack() == 0)
 			{
 				cout << "[Cpu-Run] Not need to write back now." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Not need to write back now.");
@@ -47,31 +47,31 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 			else
 			{
 				//write back
-				cout << "[Cpu-Run] Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(GetMemWbWord())) << "(" << GetMemWbWord() << ") back to r" << GetMemWbIndex() << "." << endl;
-				IOHelper::WriteLog("[Cpu-Run] Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(GetMemWbWord())) + "(" + to_string(GetMemWbWord()) + ") back to r" + to_string(GetMemWbIndex()) + ".");
-				GetGeneralPurposeRegisterSet().Set(GetMemWbIndex(), GetMemWbWord());
+				cout << "[Cpu-Run] Write word " << ConvertHelper::SeperateString(ConvertHelper::WordToString(getMemWbWord())) << "(" << getMemWbWord() << ") back to r" << getMemWbIndex() << "." << endl;
+				IOHelper::WriteLog("[Cpu-Run] Write word " + ConvertHelper::SeperateString(ConvertHelper::WordToString(getMemWbWord())) + "(" + to_string(getMemWbWord()) + ") back to r" + to_string(getMemWbIndex()) + ".");
+				getGeneralPurposeRegisterSet().Set(getMemWbIndex(), getMemWbWord());
 
 				//unlock reg
-				UnlockReg(GetMemWbIndex());
+				unlockReg(getMemWbIndex());
 
 				//free fw
-				if (GetFw0Index() == GetMemWbIndex())
+				if (getFw0Index() == getMemWbIndex())
 				{
-					SetFw0Vacant();
+					setFw0Vacant();
 				}
-				else if (GetFw1Index() == GetMemWbIndex())
+				else if (getFw1Index() == getMemWbIndex())
 				{
-					SetFw1Vacant();
+					setFw1Vacant();
 				}
-				else if (GetFw2Index() == GetMemWbIndex())
+				else if (getFw2Index() == getMemWbIndex())
 				{
-					SetFw2Vacant();
+					setFw2Vacant();
 				}
 				else
 				{
 					//no index from found, something occurred
-					cout << "[Cpu-Run] Warning! Not found fw which index is " << GetMemWbIndex() << " to set it vacant." << endl;
-					IOHelper::WriteLog("[Cpu-Run] Warning! Not found fw which index is " + to_string(GetMemWbIndex()) + " to set it vacant.");
+					cout << "[Cpu-Run] Warning! Not found fw which index is " << getMemWbIndex() << " to set it vacant." << endl;
+					IOHelper::WriteLog("[Cpu-Run] Warning! Not found fw which index is " + to_string(getMemWbIndex()) + " to set it vacant.");
 				}
 			}
 		}
@@ -81,43 +81,43 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 		//MEM
 		cout << "[Cpu-Run] -------------------- " << clockNumber << " - MEM begin --------------------" << endl;
 		IOHelper::WriteLog("[Cpu-Run] -------------------- " + to_string(clockNumber) + " - MEM begin --------------------");
-		if (!IsReady(3))
+		if (!isReady(3))
 		{
 			cout << "[Cpu-Run] No work now." << endl;
 			IOHelper::WriteLog("[Cpu-Run] No work now.");
-			SetRunInterrupted(3);
+			setRunInterrupted(3);
 		}
 		else
 		{
-			if (GetExMemNeedLoad() != 0)
+			if (getExMemNeedLoad() != 0)
 			{
 				cout << "[Cpu-Run] Now load from memory..." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Now load from memory...");
 
-				SetMemWbWord(memory.ReadWord(GetExMemAddress()));
+				setMemWbWord(memory.ReadWord(getExMemAddress()));
 
 				//not allow IF
 				cout << "[Cpu-Run] Not allow IF in this clock." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Not allow IF in this clock.");
-				SetMemIfAllow(1);
+				setMemIfAllow(1);
 
 				//set FW					
 				cout << "[Cpu-Run] Find a vacant fw and store the data in." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Find a vacant fw and store the data in.");
-				if (IsFw0Vacant())
+				if (isFw0Vacant())
 				{
-					SetFw0Index(GetExMemIndex());
-					SetFw0Value(GetMemWbWord());
+					setFw0Index(getExMemIndex());
+					setFw0Value(getMemWbWord());
 				}
-				else if (IsFw1Vacant())
+				else if (isFw1Vacant())
 				{
-					SetFw1Index(GetExMemIndex());
-					SetFw1Value(GetMemWbWord());
+					setFw1Index(getExMemIndex());
+					setFw1Value(getMemWbWord());
 				}
-				else if (IsFw2Vacant())
+				else if (isFw2Vacant())
 				{
-					SetFw2Index(GetExMemIndex());
-					SetFw2Value(GetMemWbWord());
+					setFw2Index(getExMemIndex());
+					setFw2Value(getMemWbWord());
 				}
 				else
 				{
@@ -126,19 +126,19 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Warning! Not vacant fw now.");
 				}
 			}
-			else if (GetExMemNeedStore() != 0)
+			else if (getExMemNeedStore() != 0)
 			{
 				cout << "[Cpu-Run] Now store to memory..." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Now store to memory...");
 
-				memory.WriteWord(GetExMemAddress(), GetExMemRegValue());
+				memory.WriteWord(getExMemAddress(), getExMemRegValue());
 
 				//not allow IF
 				cout << "[Cpu-Run] Not allow IF in this clock." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Not allow IF in this clock.");
-				SetMemIfAllow(1);
+				setMemIfAllow(1);
 
-				SetMemWbWord(GetExMemWord());
+				setMemWbWord(getExMemWord());
 			}
 			else
 			{
@@ -148,15 +148,15 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				//allow IF
 				cout << "[Cpu-Run] Allow IF in this clock." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Allow IF in this clock.");
-				SetMemIfAllow(0);
+				setMemIfAllow(0);
 
-				SetMemWbWord(GetExMemWord());
+				setMemWbWord(getExMemWord());
 			}
 
 			cout << "[Cpu-Run] Now transfer data..." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Now transfer data...");
-			SetMemWbNeedWriteBack(GetExMemNeedWriteBack());
-			SetMemWbIndex(GetExMemIndex());
+			setMemWbNeedWriteBack(getExMemNeedWriteBack());
+			setMemWbIndex(getExMemIndex());
 			cout << "[Cpu-Run] Data transferred done." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Data transferred done.");
 		}
@@ -166,40 +166,40 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 		//EX
 		cout << "[Cpu-Run] --------------------" << clockNumber << " - EX begin --------------------" << endl;
 		IOHelper::WriteLog("[Cpu-Run] -------------------- " + to_string(clockNumber) + " - EX begin --------------------");
-		if (!IsReady(2))
+		if (!isReady(2))
 		{
 			cout << "[Cpu-Run] No work now." << endl;
 			IOHelper::WriteLog("[Cpu-Run] No work now.");
-			SetRunInterrupted(2);
+			setRunInterrupted(2);
 		}
 		else
 		{
 			//get instruction type
-			if (GetIdExTypeR() == 1)
+			if (getIdExTypeR() == 1)
 			{
 				cout << "[Cpu-Run] Type R instruction detected." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Type R instruction detected.");
 
 				//set word
-				SetExMemWord(GetAlu().CalculateR(GetIdExRs(), GetIdExRt(), GetIdExShamt(), GetIdExFunc()));
+				setExMemWord(getAlu().CalculateR(getIdExRs(), getIdExRt(), getIdExShamt(), getIdExFunc()));
 
 				//set FW
 				cout << "[Cpu-Run] Find a vacant fw and store the data in." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Find a vacant fw and store the data in.");
-				if (IsFw0Vacant())
+				if (isFw0Vacant())
 				{
-					SetFw0Index(GetIdExIndex());
-					SetFw0Value(GetExMemWord());
+					setFw0Index(getIdExIndex());
+					setFw0Value(getExMemWord());
 				}
-				else if (IsFw1Vacant())
+				else if (isFw1Vacant())
 				{
-					SetFw1Index(GetIdExIndex());
-					SetFw1Value(GetExMemWord());
+					setFw1Index(getIdExIndex());
+					setFw1Value(getExMemWord());
 				}
-				else if (IsFw2Vacant())
+				else if (isFw2Vacant())
 				{
-					SetFw2Index(GetIdExIndex());
-					SetFw2Value(GetExMemWord());
+					setFw2Index(getIdExIndex());
+					setFw2Value(getExMemWord());
 				}
 				else
 				{
@@ -208,12 +208,12 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Warning! Not vacant fw now.");
 				}
 			}
-			else if (GetIdExTypeI() == 1)
+			else if (getIdExTypeI() == 1)
 			{
 				cout << "[Cpu-Run] Type I instruction detected." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Type I instruction detected.");
 
-				switch (GetIdExOp())
+				switch (getIdExOp())
 				{
 				case 0x0C:
 				case 0x0D:
@@ -221,25 +221,25 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					//andi ori xori
 
 					//set word
-					SetExMemWord(GetAlu().CalculateI(GetIdExOp(), GetIdExRs(), GetIdExRt(), GetIdExImmediate()));
+					setExMemWord(getAlu().CalculateI(getIdExOp(), getIdExRs(), getIdExRt(), getIdExImmediate()));
 
 					//set FW
 					cout << "[Cpu-Run] Find a vacant fw and store the data in." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find a vacant fw and store the data in.");
-					if (IsFw0Vacant())
+					if (isFw0Vacant())
 					{
-						SetFw0Index(GetIdExIndex());
-						SetFw0Value(GetExMemWord());
+						setFw0Index(getIdExIndex());
+						setFw0Value(getExMemWord());
 					}
-					else if (IsFw1Vacant())
+					else if (isFw1Vacant())
 					{
-						SetFw1Index(GetIdExIndex());
-						SetFw1Value(GetExMemWord());
+						setFw1Index(getIdExIndex());
+						setFw1Value(getExMemWord());
 					}
-					else if (IsFw2Vacant())
+					else if (isFw2Vacant())
 					{
-						SetFw2Index(GetIdExIndex());
-						SetFw2Value(GetExMemWord());
+						setFw2Index(getIdExIndex());
+						setFw2Value(getExMemWord());
 					}
 					else
 					{
@@ -252,12 +252,12 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				case 0x04:
 					//beq
 
-					if (GetIdExRs() == GetIdExRt())
+					if (getIdExRs() == getIdExRt())
 					{
 						cout << "[Cpu-Run] Branch instruction beq detected and transition condition satisfied!" << endl;
 						IOHelper::WriteLog("[Cpu-Run] Branch instruction beq detected and transition condition satisfied!");
 
-						SetPc(GetIdExPc() + 4 + ConvertHelper::GetSignExtendWord(GetIdExImmediate() << 2));
+						setPc(getIdExPc() + 4 + ConvertHelper::GetSignExtendWord(getIdExImmediate() << 2));
 
 						//reset
 						cout << "[Cpu-Run] Reset left process in this clock." << endl;
@@ -274,12 +274,12 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				case 0x05:
 					//bne
 
-					if (GetIdExRs() != GetIdExRt())
+					if (getIdExRs() != getIdExRt())
 					{
 						cout << "[Cpu-Run] Branch instruction bne detected and transition condition satisfied!" << endl;
 						IOHelper::WriteLog("[Cpu-Run] Branch instruction bne detected and transition condition satisfied!");
 
-						SetPc(GetIdExPc() + 4 + ConvertHelper::GetSignExtendWord(GetIdExImmediate() << 2));
+						setPc(getIdExPc() + 4 + ConvertHelper::GetSignExtendWord(getIdExImmediate() << 2));
 
 						//reset
 						cout << "[Cpu-Run] Reset left process in this clock." << endl;
@@ -297,21 +297,21 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					//lw
 
 					//set address
-					SetExMemAddress(GetAlu().CalculateI(GetIdExOp(), GetIdExRs(), GetIdExRt(), GetIdExImmediate()));
+					setExMemAddress(getAlu().CalculateI(getIdExOp(), getIdExRs(), getIdExRt(), getIdExImmediate()));
 
 					break;
 				case 0x2B:
 					//sw
 
 					//set address
-					SetExMemAddress(GetAlu().CalculateI(GetIdExOp(), GetIdExRs(), GetIdExRt(), GetIdExImmediate()));
+					setExMemAddress(getAlu().CalculateI(getIdExOp(), getIdExRs(), getIdExRt(), getIdExImmediate()));
 
 					break;
 				default:
 					break;
 				}
 			}
-			else if (GetIdExTypeJ() == 1)
+			else if (getIdExTypeJ() == 1)
 			{
 				cout << "[Cpu-Run] Type I instruction detected." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Type I instruction detected.");
@@ -327,11 +327,11 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 			//trans regs
 			cout << "[Cpu-Run] Now transfer data..." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Now transfer data...");
-			SetExMemNeedLoad(GetIdExNeedLoad());
-			SetExMemNeedStore(GetIdExNeedStore());
-			SetExMemRegValue(GetIdExRegValue());
-			SetExMemNeedWriteBack(GetIdExNeedWriteBack());
-			SetExMemIndex(GetIdExIndex());
+			setExMemNeedLoad(getIdExNeedLoad());
+			setExMemNeedStore(getIdExNeedStore());
+			setExMemRegValue(getIdExRegValue());
+			setExMemNeedWriteBack(getIdExNeedWriteBack());
+			setExMemIndex(getIdExIndex());
 			cout << "[Cpu-Run] Data transferred done." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Data transferred done.");
 		}
@@ -341,107 +341,107 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 		//ID
 		cout << "[Cpu-Run] -------------------- " << clockNumber << " - ID begin --------------------" << endl;
 		IOHelper::WriteLog("[Cpu-Run] -------------------- " + to_string(clockNumber) + " - ID begin -------------------- ");
-		if (!IsReady(1))
+		if (!isReady(1))
 		{
 			cout << "[Cpu-Run] No work now." << endl;
 			IOHelper::WriteLog("[Cpu-Run] No work now.");
-			SetRunInterrupted(1);
+			setRunInterrupted(1);
 		}
 		else
 		{
 			//clear reg
 			cout << "[Cpu-Run] Now clear regsiters..." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Now clear registers...");
-			SetIdExTypeR(0);
-			SetIdExTypeJ(0);
-			SetIdExTypeI(0);
-			SetIdExOp(0);
-			SetIdExRs(0);
-			SetIdExRt(0);
-			SetIdExRd(0);
-			SetIdExShamt(0);
-			SetIdExFunc(0);
-			SetIdExImmediate(0);
-			SetIdExAddress_(0);
-			SetIdExNeedLoad(0);
-			SetIdExNeedStore(0);
-			SetIdExRegValue(0);
-			SetIdExNeedWriteBack(0);
-			SetIdExIndex(0);
+			setIdExTypeR(0);
+			setIdExTypeJ(0);
+			setIdExTypeI(0);
+			setIdExOp(0);
+			setIdExRs(0);
+			setIdExRt(0);
+			setIdExRd(0);
+			setIdExShamt(0);
+			setIdExFunc(0);
+			setIdExImmediate(0);
+			setIdExAddress_(0);
+			setIdExNeedLoad(0);
+			setIdExNeedStore(0);
+			setIdExRegValue(0);
+			setIdExNeedWriteBack(0);
+			setIdExIndex(0);
 			cout << "[Cpu-Run] Clear registers done." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Clear registers done.");
 
 			//category instruction loaded in IR
 			cout << "[Cpu-Run] Now category instruction loaded in IR..." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Now category instruction loaded in IR...");
-			switch (GetDecoder().GetOp(GetIr()))
+			switch (getDecoder().GetOp(getIr()))
 			{
 			case 0x00:
 				cout << "[Cpu-Run] Op is 0x00, Type R instruction ensured." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Op is 0x00, Type R instruction ensured.");
 
 				//type R
-				SetIdExTypeR(1);
+				setIdExTypeR(1);
 
 				//set op
-				SetIdExOp(0);
+				setIdExOp(0);
 
 				//set func
-				switch (GetDecoder().GetFunc(GetIr()))
+				switch (getDecoder().GetFunc(getIr()))
 				{
 				case 0x21:
 					//addu
 					cout << "[Cpu-Run] Func is 0x21, addu ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x21, addu ensured.");
-					SetIdExFunc(0x21);
+					setIdExFunc(0x21);
 					break;
 				case 0x23:
 					//subu
 					cout << "[Cpu-Run] Func is 0x23, subu ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x23, subu ensured.");
-					SetIdExFunc(0x23);
+					setIdExFunc(0x23);
 					break;
 				case 0x24:
 					//and
 					cout << "[Cpu-Run] Func is 0x24, and ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x24, and ensured.");
-					SetIdExFunc(0x24);
+					setIdExFunc(0x24);
 					break;
 				case 0x25:
 					//or
 					cout << "[Cpu-Run] Func is 0x25, or ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x25, or ensured.");
-					SetIdExFunc(0x25);
+					setIdExFunc(0x25);
 					break;
 				case 0x26:
 					//xor
 					cout << "[Cpu-Run] Func is 0x26, xor ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x26, xor ensured.");
-					SetIdExFunc(0x26);
+					setIdExFunc(0x26);
 					break;
 				case 0x27:
 					//nor
 					cout << "[Cpu-Run] Func is 0x27, nor ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x27, nor ensured.");
-					SetIdExFunc(0x27);
+					setIdExFunc(0x27);
 					break;
 				case 0x00:
 					//sll
 					cout << "[Cpu-Run] Func is 0x00, sll ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x00, sll ensured.");
-					SetIdExFunc(0x00);
+					setIdExFunc(0x00);
 					break;
 				case 0x02:
 					//srl
 					cout << "[Cpu-Run] Func is 0x02, srl ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x02, srl ensured.");
-					SetIdExFunc(0x02);
+					setIdExFunc(0x02);
 					break;
 				case 0x08:
 					//jr
 					cout << "[Cpu-Run] Func is 0x08, jr ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Func is 0x08, jr ensured.");
-					SetIdExFunc(0x08);
+					setIdExFunc(0x08);
 
 					cout << "[Cpu-Run] Transition instruction jr detected!" << endl;
 					IOHelper::WriteLog("[Cpu-Run] Transition instruction jr detected!");
@@ -449,23 +449,23 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					cout << "[Cpu-Run] Try get [rs] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rs] from fw.");
 					//can rs get from fw
-					if (GetFw0Index() == GetDecoder().GetRs(GetIr()))
+					if (getFw0Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw0.");
-						SetIdExRs(GetFw0Value());
+						setIdExRs(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw1.");
-						SetIdExRs(GetFw1Value());
+						setIdExRs(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw2.");
-						SetIdExRs(GetFw2Value());
+						setIdExRs(getFw2Value());
 					}
 					else
 					{
@@ -473,10 +473,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rs] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRs(GetIr())))
+						if (isRegLocked(getDecoder().GetRs(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRs(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRs(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRs(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRs(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -487,12 +487,12 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rs] from gprs.");
 
 							//set rs
-							SetIdExRs(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRs(GetIr())));
+							setIdExRs(getGeneralPurposeRegisterSet().Get(getDecoder().GetRs(getIr())));
 						}
 					}
 
 					//change pc
-					SetPc(GetIdExRs());
+					setPc(getIdExRs());
 
 					//reset
 					cout << "[Cpu-Run] Reset left process in this clock." << endl;
@@ -502,44 +502,44 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					break;
 				default:
 					//not support 
-					cout << "[Cpu-Run] Error! Invalid instruction " << ConvertHelper::InstructionToString(GetIr()) << " detected! Now exit..." << endl;
-					IOHelper::WriteLog("[Cpu-Run] Error! Invalid instruction " + ConvertHelper::InstructionToString(GetIr()) + " detected! Now exit...");
+					cout << "[Cpu-Run] Error! Invalid instruction " << ConvertHelper::InstructionToString(getIr()) << " detected! Now exit..." << endl;
+					IOHelper::WriteLog("[Cpu-Run] Error! Invalid instruction " + ConvertHelper::InstructionToString(getIr()) + " detected! Now exit...");
 					exit(0);
 					break;
 				}
 
 				//set shamt
-				SetIdExShamt(GetDecoder().GetShamt(GetIr()));
+				setIdExShamt(getDecoder().GetShamt(getIr()));
 
 				cout << "[Cpu-Run] Final write back register index is in rd here." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Final write back register index is in rd here.");
 
 				//set rd
-				SetIdExRd(GetDecoder().GetRd(GetIr()));
+				setIdExRd(getDecoder().GetRd(getIr()));
 
 				//set index
-				SetIdExIndex(GetDecoder().GetRd(GetIr()));
+				setIdExIndex(getDecoder().GetRd(getIr()));
 
 				cout << "[Cpu-Run] Try get [rt] from fw." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Try get [rt] from fw.");
 				//can rt get from fw
-				if (GetFw0Index() == GetDecoder().GetRt(GetIr()))
+				if (getFw0Index() == getDecoder().GetRt(getIr()))
 				{
 					cout << "[Cpu-Run] Find [rt] from fw0." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw0.");
-					SetIdExRt(GetFw0Value());
+					setIdExRt(getFw0Value());
 				}
-				else if (GetFw1Index() == GetDecoder().GetRt(GetIr()))
+				else if (getFw1Index() == getDecoder().GetRt(getIr()))
 				{
 					cout << "[Cpu-Run] Find [rt] from fw1." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw1.");
-					SetIdExRt(GetFw1Value());
+					setIdExRt(getFw1Value());
 				}
-				else if (GetFw2Index() == GetDecoder().GetRt(GetIr()))
+				else if (getFw2Index() == getDecoder().GetRt(getIr()))
 				{
 					cout << "[Cpu-Run] Find [rt] from fw2." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw2.");
-					SetIdExRt(GetFw2Value());
+					setIdExRt(getFw2Value());
 				}
 				else
 				{
@@ -547,10 +547,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Fail to get [rt] from fw.");
 
 					//is reg locked
-					if (IsRegLocked(GetDecoder().GetRt(GetIr())))
+					if (isRegLocked(getDecoder().GetRt(getIr())))
 					{
-						cout << "[Cpu-Run] Register r" << GetDecoder().GetRt(GetIr()) << " locked! Now delay..." << endl;
-						IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRt(GetIr())) + " locked! Now delay...");
+						cout << "[Cpu-Run] Register r" << getDecoder().GetRt(getIr()) << " locked! Now delay..." << endl;
+						IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRt(getIr())) + " locked! Now delay...");
 
 						//delay
 						throw 1 + 5;
@@ -561,30 +561,30 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Get [rt] from gprs.");
 
 						//set rt
-						SetIdExRt(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRt(GetIr())));
+						setIdExRt(getGeneralPurposeRegisterSet().Get(getDecoder().GetRt(getIr())));
 					}
 				}
 
 				cout << "[Cpu-Run] Try get [rs] from fw." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Try get [rs] from fw.");
 				//can rs get from fw
-				if (GetFw0Index() == GetDecoder().GetRs(GetIr()))
+				if (getFw0Index() == getDecoder().GetRs(getIr()))
 				{
 					cout << "[Cpu-Run] Find [rs] from fw0." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw0.");
-					SetIdExRs(GetFw0Value());
+					setIdExRs(getFw0Value());
 				}
-				else if (GetFw1Index() == GetDecoder().GetRs(GetIr()))
+				else if (getFw1Index() == getDecoder().GetRs(getIr()))
 				{
 					cout << "[Cpu-Run] Find [rs] from fw1." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw1.");
-					SetIdExRs(GetFw1Value());
+					setIdExRs(getFw1Value());
 				}
-				else if (GetFw2Index() == GetDecoder().GetRs(GetIr()))
+				else if (getFw2Index() == getDecoder().GetRs(getIr()))
 				{
 					cout << "[Cpu-Run] Find [rs] from fw2." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw2.");
-					SetIdExRs(GetFw2Value());
+					setIdExRs(getFw2Value());
 				}
 				else
 				{
@@ -592,10 +592,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Fail to get [rs] from fw.");
 
 					//is reg locked
-					if (IsRegLocked(GetDecoder().GetRs(GetIr())))
+					if (isRegLocked(getDecoder().GetRs(getIr())))
 					{
-						cout << "[Cpu-Run] Register r" << GetDecoder().GetRs(GetIr()) << " locked! Now delay..." << endl;
-						IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRs(GetIr())) + " locked! Now delay...");
+						cout << "[Cpu-Run] Register r" << getDecoder().GetRs(getIr()) << " locked! Now delay..." << endl;
+						IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRs(getIr())) + " locked! Now delay...");
 
 						//delay
 						throw 1 + 5;
@@ -606,19 +606,19 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Get [rs] from gprs.");
 
 						//set rs
-						SetIdExRs(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRs(GetIr())));
+						setIdExRs(getGeneralPurposeRegisterSet().Get(getDecoder().GetRs(getIr())));
 					}
 				}
 
 				//lock rd
 				cout << "[Cpu-Run] Lock register." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Lock register.");
-				LockReg(GetDecoder().GetRd(GetIr()));
+				lockReg(getDecoder().GetRd(getIr()));
 
 				//set need write back
 				cout << "[Cpu-Run] Set need write back." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Set need write back.");
-				SetIdExNeedWriteBack(1);
+				setIdExNeedWriteBack(1);
 
 				break;
 			case 0x02:
@@ -626,7 +626,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				IOHelper::WriteLog("[Cpu-Run] Op is 0x02, Type R instruction ensured.");
 
 				//type J
-				SetIdExTypeJ(1);
+				setIdExTypeJ(1);
 
 				//j
 
@@ -634,7 +634,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				IOHelper::WriteLog("[Cpu-Run] Transition instruction j detected!");
 
 				//change pc
-				SetPc(GetDecoder().GetAddress(GetIr()));
+				setPc(getDecoder().GetAddress(getIr()));
 
 				//reset
 				cout << "[Cpu-Run] Reset left process in this clock." << endl;
@@ -647,58 +647,58 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				IOHelper::WriteLog("[Cpu-Run] Op is not 0x00 and 0x02, Type I instruction ensured.");
 
 				//case I
-				SetIdExTypeI(1);
+				setIdExTypeI(1);
 
 				//set op
-				switch (GetDecoder().GetOp(GetIr()))
+				switch (getDecoder().GetOp(getIr()))
 				{
 				case 0x0C:
 					//andi
 					cout << "[Cpu-Run] Op is 0x0C, andi ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x0C, andi ensured.");
-					SetIdExOp(0x0C);
+					setIdExOp(0x0C);
 					break;
 				case 0x0D:
 					//ori
 					cout << "[Cpu-Run] Op is 0x0D, ori ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x0D, ori ensured.");
-					SetIdExOp(0x0D);
+					setIdExOp(0x0D);
 					break;
 				case 0x0E:
 					//xori
 					cout << "[Cpu-Run] Op is 0x0E, xori ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x0E, xori ensured.");
-					SetIdExOp(0x0E);
+					setIdExOp(0x0E);
 					break;
 				case 0x04:
 					//beq
 					cout << "[Cpu-Run] Op is 0x04, beq ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x04, beq ensured.");
-					SetIdExOp(0x04);
+					setIdExOp(0x04);
 					break;
 				case 0x05:
 					//bne
 					cout << "[Cpu-Run] Op is 0x05, bne ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x05, bne ensured.");
-					SetIdExOp(0x05);
+					setIdExOp(0x05);
 					break;
 				case 0x23:
 					//lw
 					cout << "[Cpu-Run] Op is 0x23, lw ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x23, lw ensured.");
-					SetIdExOp(0x23);
+					setIdExOp(0x23);
 					cout << "[Cpu-Run] Set need load." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Set need load.");
-					SetIdExNeedLoad(1);
+					setIdExNeedLoad(1);
 					break;
 				case 0x2B:
 					//sw
 					cout << "[Cpu-Run] Op is 0x2B, sw ensured." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Op is 0x2B, sw ensured.");
-					SetIdExOp(0x2B);
+					setIdExOp(0x2B);
 					cout << "[Cpu-Run] Set need store." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Set need store.");
-					SetIdExNeedStore(1);
+					setIdExNeedStore(1);
 					break;
 				case 0x3F:
 					//end of instructions (customized)
@@ -716,17 +716,17 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					break;
 				default:
 					//not support
-					cout << "[Cpu-Run] Error! Invalid instruction " << ConvertHelper::InstructionToString(GetIr()) << " detected! Now exit..." << endl;
-					IOHelper::WriteLog("[Cpu-Run] Error! Invalid instruction " + ConvertHelper::InstructionToString(GetIr()) + " detected! Now exit...");
+					cout << "[Cpu-Run] Error! Invalid instruction " << ConvertHelper::InstructionToString(getIr()) << " detected! Now exit..." << endl;
+					IOHelper::WriteLog("[Cpu-Run] Error! Invalid instruction " + ConvertHelper::InstructionToString(getIr()) + " detected! Now exit...");
 					exit(0);
 					break;
 				}
 
 				//set immediate
-				SetIdExImmediate(GetDecoder().GetImmediate(GetIr()));
+				setIdExImmediate(getDecoder().GetImmediate(getIr()));
 
 				//rs rt related
-				switch (GetDecoder().GetOp(GetIr()))
+				switch (getDecoder().GetOp(getIr()))
 				{
 				case 0x0C:
 				case 0x0D:
@@ -737,36 +737,36 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Final write back register index is in rt here.");
 
 					//set rt
-					SetIdExRt(GetDecoder().GetRt(GetIr()));
+					setIdExRt(getDecoder().GetRt(getIr()));
 
 					//set index
-					SetIdExIndex(GetDecoder().GetRt(GetIr()));
+					setIdExIndex(getDecoder().GetRt(getIr()));
 
 					//set need write back
 					cout << "[Cpu-Run] Set need write back." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Set need write back.");
-					SetIdExNeedWriteBack(1);
+					setIdExNeedWriteBack(1);
 
 					cout << "[Cpu-Run] Try get [rs] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rs] from fw.");
 					//can rs get from fw
-					if (GetFw0Index() == GetDecoder().GetRs(GetIr()))
+					if (getFw0Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw0.");
-						SetIdExRs(GetFw0Value());
+						setIdExRs(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw1.");
-						SetIdExRs(GetFw1Value());
+						setIdExRs(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw2.");
-						SetIdExRs(GetFw2Value());
+						setIdExRs(getFw2Value());
 					}
 					else
 					{
@@ -774,10 +774,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rs] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRs(GetIr())))
+						if (isRegLocked(getDecoder().GetRs(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRs(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRs(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRs(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRs(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -788,14 +788,14 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rs] from gprs.");
 
 							//set rs
-							SetIdExRs(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRs(GetIr())));
+							setIdExRs(getGeneralPurposeRegisterSet().Get(getDecoder().GetRs(getIr())));
 						}
 					}
 
 					//lock rt
 					cout << "[Cpu-Run] Lock register." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Lock register.");
-					LockReg(GetDecoder().GetRt(GetIr()));
+					lockReg(getDecoder().GetRt(getIr()));
 
 					break;
 				case 0x04:
@@ -805,23 +805,23 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					cout << "[Cpu-Run] Try get [rt] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rt] from fw.");
 					//can rt get from fw
-					if (GetFw0Index() == GetDecoder().GetRt(GetIr()))
+					if (getFw0Index() == getDecoder().GetRt(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rt] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw0.");
-						SetIdExRt(GetFw0Value());
+						setIdExRt(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRt(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRt(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rt] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw1.");
-						SetIdExRt(GetFw1Value());
+						setIdExRt(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRt(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRt(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rt] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw2.");
-						SetIdExRt(GetFw2Value());
+						setIdExRt(getFw2Value());
 					}
 					else
 					{
@@ -829,10 +829,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rt] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRt(GetIr())))
+						if (isRegLocked(getDecoder().GetRt(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRt(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRt(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRt(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRt(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -843,30 +843,30 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rt] from gprs.");
 
 							//set rt
-							SetIdExRt(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRt(GetIr())));
+							setIdExRt(getGeneralPurposeRegisterSet().Get(getDecoder().GetRt(getIr())));
 						}
 					}
 
 					cout << "[Cpu-Run] Try get [rs] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rs] from fw.");
 					//can rs get from fw
-					if (GetFw0Index() == GetDecoder().GetRs(GetIr()))
+					if (getFw0Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw0.");
-						SetIdExRs(GetFw0Value());
+						setIdExRs(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw1.");
-						SetIdExRs(GetFw1Value());
+						setIdExRs(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw2.");
-						SetIdExRs(GetFw2Value());
+						setIdExRs(getFw2Value());
 					}
 					else
 					{
@@ -874,10 +874,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rs] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRs(GetIr())))
+						if (isRegLocked(getDecoder().GetRs(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRs(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRs(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRs(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRs(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -888,7 +888,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rs] from gprs.");
 
 							//set rs
-							SetIdExRs(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRs(GetIr())));
+							setIdExRs(getGeneralPurposeRegisterSet().Get(getDecoder().GetRs(getIr())));
 						}
 					}
 
@@ -900,36 +900,36 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Final write back register index is in rt here.");
 
 					//set rt
-					SetIdExRt(GetDecoder().GetRt(GetIr()));
+					setIdExRt(getDecoder().GetRt(getIr()));
 
 					//set index
-					SetIdExIndex(GetDecoder().GetRt(GetIr()));
+					setIdExIndex(getDecoder().GetRt(getIr()));
 
 					//set need write back
 					cout << "[Cpu-Run] Set need write back." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Set need write back.");
-					SetIdExNeedWriteBack(1);
+					setIdExNeedWriteBack(1);
 
 					cout << "[Cpu-Run] Try get [rs] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rs] from fw.");
 					//can rs get from fw
-					if (GetFw0Index() == GetDecoder().GetRs(GetIr()))
+					if (getFw0Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw0.");
-						SetIdExRs(GetFw0Value());
+						setIdExRs(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw1.");
-						SetIdExRs(GetFw1Value());
+						setIdExRs(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw2.");
-						SetIdExRs(GetFw2Value());
+						setIdExRs(getFw2Value());
 					}
 					else
 					{
@@ -937,10 +937,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rs] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRs(GetIr())))
+						if (isRegLocked(getDecoder().GetRs(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRs(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRs(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRs(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRs(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -951,14 +951,14 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rs] from gprs.");
 
 							//set rs
-							SetIdExRs(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRs(GetIr())));
+							setIdExRs(getGeneralPurposeRegisterSet().Get(getDecoder().GetRs(getIr())));
 						}
 					}
 
 					//lock rt
 					cout << "[Cpu-Run] Lock register." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Lock register.");
-					LockReg(GetDecoder().GetRt(GetIr()));
+					lockReg(getDecoder().GetRt(getIr()));
 
 					break;
 				case 0x2B:
@@ -967,23 +967,23 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					cout << "[Cpu-Run] Try get [rt] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rt] from fw.");
 					//can rt get from fw
-					if (GetFw0Index() == GetDecoder().GetRt(GetIr()))
+					if (getFw0Index() == getDecoder().GetRt(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rt] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw0.");
-						SetIdExRt(GetFw0Value());
+						setIdExRt(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRt(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRt(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rt] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw1.");
-						SetIdExRt(GetFw1Value());
+						setIdExRt(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRt(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRt(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rt] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rt] from fw2.");
-						SetIdExRt(GetFw2Value());
+						setIdExRt(getFw2Value());
 					}
 					else
 					{
@@ -991,10 +991,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rt] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRt(GetIr())))
+						if (isRegLocked(getDecoder().GetRt(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRt(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRt(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRt(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRt(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -1005,7 +1005,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rt] from gprs.");
 
 							//set rt
-							SetIdExRt(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRt(GetIr())));
+							setIdExRt(getGeneralPurposeRegisterSet().Get(getDecoder().GetRt(getIr())));
 						}
 					}
 
@@ -1013,28 +1013,28 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 					IOHelper::WriteLog("[Cpu-Run] Set value which to store to memory.");
 
 					//set reg value
-					SetIdExRegValue(GetIdExRt());
+					setIdExRegValue(getIdExRt());
 
 					cout << "[Cpu-Run] Try get [rs] from fw." << endl;
 					IOHelper::WriteLog("[Cpu-Run] Try get [rs] from fw.");
 					//can rs get from fw
-					if (GetFw0Index() == GetDecoder().GetRs(GetIr()))
+					if (getFw0Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw0." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw0.");
-						SetIdExRs(GetFw0Value());
+						setIdExRs(getFw0Value());
 					}
-					else if (GetFw1Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw1Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw1." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw1.");
-						SetIdExRs(GetFw1Value());
+						setIdExRs(getFw1Value());
 					}
-					else if (GetFw2Index() == GetDecoder().GetRs(GetIr()))
+					else if (getFw2Index() == getDecoder().GetRs(getIr()))
 					{
 						cout << "[Cpu-Run] Find [rs] from fw2." << endl;
 						IOHelper::WriteLog("[Cpu-Run] Find [rs] from fw2.");
-						SetIdExRs(GetFw2Value());
+						setIdExRs(getFw2Value());
 					}
 					else
 					{
@@ -1042,10 +1042,10 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 						IOHelper::WriteLog("[Cpu-Run] Fail to get [rs] from fw.");
 
 						//is reg locked
-						if (IsRegLocked(GetDecoder().GetRs(GetIr())))
+						if (isRegLocked(getDecoder().GetRs(getIr())))
 						{
-							cout << "[Cpu-Run] Register r" << GetDecoder().GetRs(GetIr()) << " locked! Now delay..." << endl;
-							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(GetDecoder().GetRs(GetIr())) + " locked! Now delay...");
+							cout << "[Cpu-Run] Register r" << getDecoder().GetRs(getIr()) << " locked! Now delay..." << endl;
+							IOHelper::WriteLog("[Cpu-Run] Register r" + to_string(getDecoder().GetRs(getIr())) + " locked! Now delay...");
 
 							//delay
 							throw 1 + 5;
@@ -1056,7 +1056,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 							IOHelper::WriteLog("[Cpu-Run] Get [rs] from gprs.");
 
 							//set rs
-							SetIdExRs(GetGeneralPurposeRegisterSet().Get(GetDecoder().GetRs(GetIr())));
+							setIdExRs(getGeneralPurposeRegisterSet().Get(getDecoder().GetRs(getIr())));
 						}
 					}
 					break;
@@ -1069,7 +1069,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 			//trans regs
 			cout << "[Cpu-Run] Now transfer data..." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Now transfer data...");
-			SetIdExPc(GetIfIdPc());
+			setIdExPc(getIfIdPc());
 			cout << "[Cpu-Run] Data transferred done." << endl;
 			IOHelper::WriteLog("[Cpu-Run] Data transferred done.");
 		}
@@ -1079,15 +1079,15 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 		//IF
 		cout << "[Cpu-Run] -------------------- " << clockNumber << " - IF begin --------------------" << endl;
 		IOHelper::WriteLog("[Cpu-Run] -------------------- " + to_string(clockNumber) + " - IF begin --------------------");
-		if (!IsReady(0))
+		if (!isReady(0))
 		{
 			cout << "[Cpu-Run] No work now." << endl;
 			IOHelper::WriteLog("[Cpu-Run] No work now.");
-			SetRunInterrupted(0);
+			setRunInterrupted(0);
 		}
 		else
 		{
-			if (GetMemIfAllow() == 1)
+			if (getMemIfAllow() == 1)
 			{
 				cout << "[Cpu-Run] Find that load/store done in this clock. Now delay..." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Find that load/store done in this clock. Now delay...");
@@ -1095,7 +1095,7 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				//allow IF
 				cout << "[Cpu-Run] Allow IF in next clock if possible." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Allow IF in next clock if possible.");
-				SetMemIfAllow(0);
+				setMemIfAllow(0);
 
 				//delay
 				throw 0 + 5;
@@ -1105,15 +1105,15 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 				//fetch instruction from memory to IR
 				cout << "[Cpu-Run] Fetch instruction from memory to IR." << endl;
 				IOHelper::WriteLog("[Cpu-Run] Fetch instruction from memory to IR.");
-				SetIr(memory.ReadWord(GetPc()));
+				setIr(memory.ReadWord(getPc()));
 
 				//set instruction pc
-				SetIfIdPc(GetPc());
+				setIfIdPc(getPc());
 
 				//modify pc
 				cout << "[Cpu-Run] PC + 1" << endl;
 				IOHelper::WriteLog("[Cpu-Run] PC + 1");
-				SetPc(GetPc() + 4);
+				setPc(getPc() + 4);
 			}
 		}
 		cout << "[Cpu-Run] -------------------- " << clockNumber << " - IF end --------------------" << endl;
@@ -1129,15 +1129,15 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 		switch (index % 5)
 		{
 		case 4:
-			SetRunInterrupted(4);
+			setRunInterrupted(4);
 		case 3:
-			SetRunInterrupted(3);
+			setRunInterrupted(3);
 		case 2:
-			SetRunInterrupted(2);
+			setRunInterrupted(2);
 		case 1:
-			SetRunInterrupted(1);
+			setRunInterrupted(1);
 		case 0:
-			SetRunInterrupted(0);
+			setRunInterrupted(0);
 			break;
 		default:
 			break;
@@ -1147,13 +1147,13 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 		switch (index)
 		{
 		case 4 + 5:
-			SetRunDone(3);
+			setRunDone(3);
 		case 3 + 5:
-			SetRunDone(2);
+			setRunDone(2);
 		case 2 + 5:
-			SetRunDone(1);
+			setRunDone(1);
 		case 1 + 5:
-			SetRunDone(0);
+			setRunDone(0);
 		case 0 + 5:
 			break;
 		default:
@@ -1164,47 +1164,47 @@ void Cpu::Run(Memory & memory, bool &eoiDetected, int clockNumber)
 	//set next clock time ready
 	cout << "[Cpu-Run] Now set next clock time ready..." << endl;
 	IOHelper::WriteLog("[Cpu-Run] Now set next clock time ready...");
-	SetNewReady();
+	setNewReady();
 
 	//end of instructions detected
 	if (eoiDetected)
 	{
 		cout << "[Cpu-Run] Eoi detected, no more valid instructions to run." << endl;
 		IOHelper::WriteLog("[Cpu-Run] Eoi detected, no more valid instructions to run.");
-		SetNotReady(0);
+		setNotReady(0);
 	}
 }
 
-GeneralPurposeRegisterSet & Cpu::GetGeneralPurposeRegisterSet()
+GeneralPurposeRegisterSet & Cpu::getGeneralPurposeRegisterSet()
 {
 	return this->gprs;
 }
 
-void Cpu::SetPc(address add)
+void Cpu::setPc(address add)
 {
 	cout << "[Cpu] Set register PC with value " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) << "(" << add << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register PC with value " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) + "(" + to_string(add) + ").");
 	pc.Set(add);
 }
 
-address Cpu::GetPc()
+address Cpu::getPc()
 {
 	return pc.Get();
 }
 
-void Cpu::SetIr(instruction i)
+void Cpu::setIr(instruction i)
 {
 	cout << "[Cpu] Set register IR with value " << ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) << "(" << i << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IR with value " + ConvertHelper::SeperateString(ConvertHelper::InstructionToString(i)) + "(" + to_string(i) + ").");
 	ir.Set(i);
 }
 
-instruction Cpu::GetIr()
+instruction Cpu::getIr()
 {
 	return ir.Get();
 }
 
-void Cpu::LockReg(int index)
+void Cpu::lockReg(int index)
 {
 	if (index >= 0 && index < 32)
 	{
@@ -1220,7 +1220,7 @@ void Cpu::LockReg(int index)
 	}
 }
 
-void Cpu::UnlockReg(int index)
+void Cpu::unlockReg(int index)
 {
 	if (index >= 0 && index < 32)
 	{
@@ -1236,7 +1236,7 @@ void Cpu::UnlockReg(int index)
 	}
 }
 
-bool Cpu::IsRegLocked(int index)
+bool Cpu::isRegLocked(int index)
 {
 	if (index >= 0 && index < 32)
 	{
@@ -1251,285 +1251,285 @@ bool Cpu::IsRegLocked(int index)
 	}
 }
 
-bool Cpu::IsFw0Vacant()
+bool Cpu::isFw0Vacant()
 {
 	return fw0_index.Get() == 999;
 }
 
-void Cpu::SetFw0Vacant()
+void Cpu::setFw0Vacant()
 {
 	cout << "[Cpu] Set register Fw0 vacant." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw0 vacant.");
 	fw0_index.Set(999);
 }
 
-void Cpu::SetFw0Value(word w)
+void Cpu::setFw0Value(word w)
 {
 	cout << "[Cpu] Set register Fw0Value with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw0Value with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	fw0_value.Set(w);
 }
 
-word Cpu::GetFw0Value()
+word Cpu::getFw0Value()
 {
 	return fw0_value.Get();
 }
 
-void Cpu::SetFw0Index(word w)
+void Cpu::setFw0Index(word w)
 {
 	cout << "[Cpu] Set register Fw0Index with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw0Index with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	fw0_index.Set(w);
 }
 
-word Cpu::GetFw0Index()
+word Cpu::getFw0Index()
 {
 	return fw0_index.Get();
 }
 
-bool Cpu::IsFw1Vacant()
+bool Cpu::isFw1Vacant()
 {
 	return fw1_index.Get() == 999;
 }
 
-void Cpu::SetFw1Vacant()
+void Cpu::setFw1Vacant()
 {
 	cout << "[Cpu] Set register Fw1 vacant." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw1 vacant.");
 	fw1_index.Set(999);
 }
 
-void Cpu::SetFw1Value(word w)
+void Cpu::setFw1Value(word w)
 {
 	cout << "[Cpu] Set register Fw1Value with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw1Value with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	fw1_value.Set(w);
 }
 
-word Cpu::GetFw1Value()
+word Cpu::getFw1Value()
 {
 	return fw1_value.Get();
 }
 
-void Cpu::SetFw1Index(word w)
+void Cpu::setFw1Index(word w)
 {
 	cout << "[Cpu] Set register Fw1Index with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw1Index with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	fw1_index.Set(w);
 }
 
-word Cpu::GetFw1Index()
+word Cpu::getFw1Index()
 {
 	return fw1_index.Get();
 }
 
-bool Cpu::IsFw2Vacant()
+bool Cpu::isFw2Vacant()
 {
 	return fw2_index.Get() == 999;
 }
 
-void Cpu::SetFw2Vacant()
+void Cpu::setFw2Vacant()
 {
 	cout << "[Cpu] Set register Fw2 vacant." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw2 vacant.");
 	fw2_index.Set(999);
 }
 
-void Cpu::SetFw2Value(word w)
+void Cpu::setFw2Value(word w)
 {
 	cout << "[Cpu] Set register Fw2Value with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw2Value with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	fw2_value.Set(w);
 }
 
-word Cpu::GetFw2Value()
+word Cpu::getFw2Value()
 {
 	return fw2_value.Get();
 }
 
-void Cpu::SetFw2Index(word w)
+void Cpu::setFw2Index(word w)
 {
 	cout << "[Cpu] Set register Fw2Index with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register Fw2Index with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	fw2_index.Set(w);
 }
 
-word Cpu::GetFw2Index()
+word Cpu::getFw2Index()
 {
 	return fw2_index.Get();
 }
 
-Decoder Cpu::GetDecoder()
+Decoder Cpu::getDecoder()
 {
 	return decoder;
 }
 
-Alu Cpu::GetAlu()
+Alu Cpu::getAlu()
 {
 	return alu;
 }
 
-void Cpu::SetIfIdPc(address add)
+void Cpu::setIfIdPc(address add)
 {
 	cout << "[Cpu] Set register IfIdPc with value " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) << "(" << add << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IfIdPc with value " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) + "(" + to_string(add) + ").");
 	if_id_pc.Set(add);
 }
 
-address Cpu::GetIfIdPc()
+address Cpu::getIfIdPc()
 {
 	return if_id_pc.Get();
 }
 
-void Cpu::SetIdExPc(address add)
+void Cpu::setIdExPc(address add)
 {
 	cout << "[Cpu] Set register IdExPc with value " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) << "(" << add << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExPc with value " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) + "(" + to_string(add) + ").");
 	id_ex_pc.Set(add);
 }
 
-address Cpu::GetIdExPc()
+address Cpu::getIdExPc()
 {
 	return id_ex_pc.Get();
 }
 
-void Cpu::SetIdExTypeR(word w)
+void Cpu::setIdExTypeR(word w)
 {
 	cout << "[Cpu] Set register IdExTypeR with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExTypeR with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_type_R.Set(w);
 }
 
-word Cpu::GetIdExTypeR()
+word Cpu::getIdExTypeR()
 {
 	return id_ex_type_R.Get();
 }
 
-void Cpu::SetIdExTypeI(word w)
+void Cpu::setIdExTypeI(word w)
 {
 	cout << "[Cpu] Set register IdExTypeI with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExTypeI with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_type_I.Set(w);
 }
 
-word Cpu::GetIdExTypeI()
+word Cpu::getIdExTypeI()
 {
 	return id_ex_type_I.Get();
 }
 
-void Cpu::SetIdExTypeJ(word w)
+void Cpu::setIdExTypeJ(word w)
 {
 	cout << "[Cpu] Set register IdExTypeJ with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExTypeJ with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_type_J.Set(w);
 }
 
-word Cpu::GetIdExTypeJ()
+word Cpu::getIdExTypeJ()
 {
 	return id_ex_type_J.Get();
 }
 
-void Cpu::SetIdExOp(word w)
+void Cpu::setIdExOp(word w)
 {
 	cout << "[Cpu] Set register IdExOp with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExOp with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_op.Set(w);
 }
 
-word Cpu::GetIdExOp()
+word Cpu::getIdExOp()
 {
 	return id_ex_op.Get();
 }
 
-void Cpu::SetIdExRs(word w)
+void Cpu::setIdExRs(word w)
 {
 	cout << "[Cpu] Set register IdExRs with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExRs with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_rs.Set(w);
 }
 
-word Cpu::GetIdExRs()
+word Cpu::getIdExRs()
 {
 	return id_ex_rs.Get();
 }
 
-void Cpu::SetIdExRt(word w)
+void Cpu::setIdExRt(word w)
 {
 	cout << "[Cpu] Set register IdExRt with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExRt with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_rt.Set(w);
 }
 
-word Cpu::GetIdExRt()
+word Cpu::getIdExRt()
 {
 	return id_ex_rt.Get();
 }
 
-void Cpu::SetIdExRd(word w)
+void Cpu::setIdExRd(word w)
 {
 	cout << "[Cpu] Set register IdExRd with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExRd with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_rd.Set(w);
 }
 
-word Cpu::GetIdExRd()
+word Cpu::getIdExRd()
 {
 	return id_ex_rd.Get();
 }
 
-void Cpu::SetIdExShamt(word w)
+void Cpu::setIdExShamt(word w)
 {
 	cout << "[Cpu] Set register IdExShamt with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExShamt with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_shamt.Set(w);
 }
 
-word Cpu::GetIdExShamt()
+word Cpu::getIdExShamt()
 {
 	return id_ex_shamt.Get();
 }
 
-void Cpu::SetIdExFunc(word w)
+void Cpu::setIdExFunc(word w)
 {
 	cout << "[Cpu] Set register IdExFunc with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExFunc with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_func.Set(w);
 }
 
-word Cpu::GetIdExFunc()
+word Cpu::getIdExFunc()
 {
 	return id_ex_func.Get();
 }
 
-void Cpu::SetIdExImmediate(word w)
+void Cpu::setIdExImmediate(word w)
 {
 	cout << "[Cpu] Set register IdExImmediate with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExImmediate with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_immediate.Set(w);
 }
 
-word Cpu::GetIdExImmediate()
+word Cpu::getIdExImmediate()
 {
 	return id_ex_immediate.Get();
 }
 
-void Cpu::SetIdExAddress_(address add)
+void Cpu::setIdExAddress_(address add)
 {
 	cout << "[Cpu] Set register IdExAddress_ with value " << ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) << "(" << add << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExAddress_ with value " + ConvertHelper::SeperateString(ConvertHelper::AddressToString(add)) + "(" + to_string(add) + ").");
 	id_ex_address_.Set(add);
 }
 
-address Cpu::GetIdExAddress_()
+address Cpu::getIdExAddress_()
 {
 	return id_ex_address_.Get();
 }
 
-bool Cpu::IsReady(int index)
+bool Cpu::isReady(int index)
 {
 	if (index >= 0 && index < 5)
 	{
-		return (isReady.Get() & (1 << index)) >> index;
+		return (isReady_.Get() & (1 << index)) >> index;
 	}
 	else
 	{
@@ -1539,14 +1539,14 @@ bool Cpu::IsReady(int index)
 	}
 }
 
-void Cpu::SetReady(int index)
+void Cpu::setReady(int index)
 {
 	if (index >= 0 && index < 5)
 	{
 		//set 1
 		cout << "[Cpu] Set process " << index << " ready." << endl;
 		IOHelper::WriteLog("[Cpu] Set process " + to_string(index) + " ready.");
-		isReady.Set(isReady.Get() | (1 << index));
+		isReady_.Set(isReady_.Get() | (1 << index));
 	}
 	else
 	{
@@ -1555,14 +1555,14 @@ void Cpu::SetReady(int index)
 	}
 }
 
-void Cpu::SetNotReady(int index)
+void Cpu::setNotReady(int index)
 {
 	if (index >= 0 && index < 5)
 	{
 		//set 0
 		cout << "[Cpu] Set process " << index << " not ready." << endl;
 		IOHelper::WriteLog("[Cpu] Set process " + to_string(index) + " not ready.");
-		isReady.Set(isReady.Get() & (~(1 << index)));
+		isReady_.Set(isReady_.Get() & (~(1 << index)));
 	}
 	else
 	{
@@ -1571,20 +1571,20 @@ void Cpu::SetNotReady(int index)
 	}
 }
 
-void Cpu::SetNewReady()
+void Cpu::setNewReady()
 {
 	for (int i = 4; i > 0; i--)
 	{
-		if (IsRunDone(i - 1))
+		if (isRunDone(i - 1))
 		{
-			SetReady(i);
+			setReady(i);
 		}
 		else
 		{
-			SetNotReady(i);
+			setNotReady(i);
 		}
 	}
-	SetReady(0);
+	setReady(0);
 }
 
 bool Cpu::HasWork()
@@ -1592,7 +1592,7 @@ bool Cpu::HasWork()
 	bool result = false;
 	for (int i = 0; i < 5; i++)
 	{
-		if (IsReady(i))
+		if (isReady(i))
 		{
 			result = true;
 			break;
@@ -1601,7 +1601,7 @@ bool Cpu::HasWork()
 	return result;
 }
 
-bool Cpu::IsRunDone(int index)
+bool Cpu::isRunDone(int index)
 {
 	if (index >= 0 && index < 5)
 	{
@@ -1615,7 +1615,7 @@ bool Cpu::IsRunDone(int index)
 	}
 }
 
-void Cpu::SetRunDone(int index)
+void Cpu::setRunDone(int index)
 {
 	if (index >= 0 && index < 5)
 	{
@@ -1631,7 +1631,7 @@ void Cpu::SetRunDone(int index)
 	}
 }
 
-void Cpu::SetRunInterrupted(int index)
+void Cpu::setRunInterrupted(int index)
 {
 	if (index >= 0 && index < 5)
 	{
@@ -1647,204 +1647,204 @@ void Cpu::SetRunInterrupted(int index)
 	}
 }
 
-void Cpu::ResetRunStatus()
+void Cpu::resetRunStatus()
 {
 	cout << "[Cpu] Reset all processes done." << endl;
 	IOHelper::WriteLog("[Cpu] Reset all processes done.");
 	for (int i = 4; i >= 0; i--)
 	{
-		SetRunDone(i);
+		setRunDone(i);
 	}
 }
 
-void Cpu::SetIdExNeedLoad(word w)
+void Cpu::setIdExNeedLoad(word w)
 {
 	cout << "[Cpu] Set register IdExNeedLoad with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExNeedLoad with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_need_load.Set(w);
 }
 
-word Cpu::GetIdExNeedLoad()
+word Cpu::getIdExNeedLoad()
 {
 	return id_ex_need_load.Get();
 }
 
-void Cpu::SetIdExNeedStore(word w)
+void Cpu::setIdExNeedStore(word w)
 {
 	cout << "[Cpu] Set register IdExNeedStore with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExNeedStore with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_need_store.Set(w);
 }
 
-word Cpu::GetIdExNeedStore()
+word Cpu::getIdExNeedStore()
 {
 	return id_ex_need_store.Get();
 }
 
-void Cpu::SetIdExRegValue(word w)
+void Cpu::setIdExRegValue(word w)
 {
 	cout << "[Cpu] Set register IdExRegValue with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExRegValue with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_reg_value.Set(w);
 }
 
-word Cpu::GetIdExRegValue()
+word Cpu::getIdExRegValue()
 {
 	return id_ex_reg_value.Get();
 }
 
-void Cpu::SetIdExNeedWriteBack(word w)
+void Cpu::setIdExNeedWriteBack(word w)
 {
 	cout << "[Cpu] Set register IdExNeedWriteBack with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExNeedWriteBack with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_need_write_back.Set(w);
 }
 
-word Cpu::GetIdExNeedWriteBack()
+word Cpu::getIdExNeedWriteBack()
 {
 	return id_ex_need_write_back.Get();
 }
 
-void Cpu::SetIdExIndex(word w)
+void Cpu::setIdExIndex(word w)
 {
 	cout << "[Cpu] Set register IdExIndex with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register IdExIndex with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	id_ex_index.Set(w);
 }
 
-word Cpu::GetIdExIndex()
+word Cpu::getIdExIndex()
 {
 	return id_ex_index.Get();
 }
 
-void Cpu::SetExMemNeedLoad(word w)
+void Cpu::setExMemNeedLoad(word w)
 {
 	cout << "[Cpu] Set register ExMemNeedLoad with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemNeedLoad with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_need_load.Set(w);
 }
 
-word Cpu::GetExMemNeedLoad()
+word Cpu::getExMemNeedLoad()
 {
 	return ex_mem_need_load.Get();
 }
 
-void Cpu::SetExMemNeedStore(word w)
+void Cpu::setExMemNeedStore(word w)
 {
 	cout << "[Cpu] Set register ExMemNeedStore with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemNeedStore with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_need_store.Set(w);
 }
 
-word Cpu::GetExMemNeedStore()
+word Cpu::getExMemNeedStore()
 {
 	return ex_mem_need_store.Get();
 }
 
-void Cpu::SetExMemAddress(address add)
+void Cpu::setExMemAddress(address add)
 {
 	cout << "[Cpu] Set register ExMemNeedAddress with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(add)) << "(" << add << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemNeedAddress with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(add)) + "(" + to_string(add) + ").");
 	ex_mem_address.Set(add);
 }
 
-address Cpu::GetExMemAddress()
+address Cpu::getExMemAddress()
 {
 	return ex_mem_address.Get();
 }
 
-void Cpu::SetExMemRegValue(word w)
+void Cpu::setExMemRegValue(word w)
 {
 	cout << "[Cpu] Set register ExMemRegValue with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemRegValue with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_reg_value.Set(w);
 }
 
-word Cpu::GetExMemRegValue()
+word Cpu::getExMemRegValue()
 {
 	return ex_mem_reg_value.Get();
 }
 
-void Cpu::SetExMemNeedWriteBack(word w)
+void Cpu::setExMemNeedWriteBack(word w)
 {
 	cout << "[Cpu] Set register ExMemNeedWriteBack with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemNeedWriteBack with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_need_write_back.Set(w);
 }
 
-word Cpu::GetExMemNeedWriteBack()
+word Cpu::getExMemNeedWriteBack()
 {
 	return ex_mem_need_write_back.Get();
 }
 
-void Cpu::SetExMemIndex(word w)
+void Cpu::setExMemIndex(word w)
 {
 	cout << "[Cpu] Set register ExMemNeedIndex with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemNeedIndex with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_index.Set(w);
 }
 
-word Cpu::GetExMemIndex()
+word Cpu::getExMemIndex()
 {
 	return ex_mem_index.Get();
 }
 
-void Cpu::SetExMemWord(word w)
+void Cpu::setExMemWord(word w)
 {
 	cout << "[Cpu] Set register ExMemNeedWord with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register ExMemNeedWord with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	ex_mem_word.Set(w);
 }
 
-word Cpu::GetExMemWord()
+word Cpu::getExMemWord()
 {
 	return ex_mem_word.Get();
 }
 
-void Cpu::SetMemIfAllow(word w)
+void Cpu::setMemIfAllow(word w)
 {
 	cout << "[Cpu] Set register MemIfAllow with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register MemIfAllow with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	mem_if_allow.Set(w);
 }
 
-word Cpu::GetMemIfAllow()
+word Cpu::getMemIfAllow()
 {
 	return mem_if_allow.Get();
 }
 
-void Cpu::SetMemWbNeedWriteBack(word w)
+void Cpu::setMemWbNeedWriteBack(word w)
 {
 	cout << "[Cpu] Set register MemWbNeedWriteBack with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register MemWbNeedWriteBack with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	mem_wb_need_write_back.Set(w);
 }
 
-word Cpu::GetMemWbNeedWriteBack()
+word Cpu::getMemWbNeedWriteBack()
 {
 	return mem_wb_need_write_back.Get();
 }
 
-void Cpu::SetMemWbIndex(word w)
+void Cpu::setMemWbIndex(word w)
 {
 	cout << "[Cpu] Set register MemWbIndex with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register MemWbIndex with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	mem_wb_index.Set(w);
 }
 
-word Cpu::GetMemWbIndex()
+word Cpu::getMemWbIndex()
 {
 	return mem_wb_index.Get();
 }
 
-void Cpu::SetMemWbWord(word w)
+void Cpu::setMemWbWord(word w)
 {
 	cout << "[Cpu] Set register MemWbWord with value " << ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) << "(" << w << ")." << endl;
 	IOHelper::WriteLog("[Cpu] Set register MemWbWord with value " + ConvertHelper::SeperateString(ConvertHelper::WordToString(w)) + "(" + to_string(w) + ").");
 	mem_wb_word.Set(w);
 }
 
-word Cpu::GetMemWbWord()
+word Cpu::getMemWbWord()
 {
 	return mem_wb_word.Get();
 }

@@ -150,7 +150,7 @@ void IOHelper::LoadRegisterData(Cpu &cpu, ifstream &in)
 			}
 		}
 
-		GeneralPurposeRegisterSet *gprs = &cpu.GetGeneralPurposeRegisterSet();
+		GeneralPurposeRegisterSet *gprs = &cpu.getGeneralPurposeRegisterSet();
 
 		//if (count == 32)
 		//{
